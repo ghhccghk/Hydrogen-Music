@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.5.0",
   "main": "background.js",
-  "author": "Kaidesuyo",
+  "author": {
+    "name": "ghhccghk",
+    "email": "2137610394@qq.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -47,16 +50,18 @@
     "productName": "Hydrogen Music",
     "appId": "114514",
     "asar": true,
+    "compression": "maximum",
     "directories": {
       "output": "release/${version}"
     },
     "files": [],
+    "artifactName": "${productName}-${version}-${os}.${ext}",
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
     "mac": {
-      "category": ""
+      "category": "public.app-category.music"
     },
     "win": {
       "icon": "./src/assets/icon/icon.ico",
@@ -67,14 +72,15 @@
       ],
       "verifyUpdateCodeSignature": false
     },
-    "linux": {},
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "Kaidesuyo",
-        "repo": "Hydrogen-Music",
-        "releaseType": "draft"
-      }
-    ]
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "pacman"
+      ],
+      "category": "AudioVideo",
+      "icon": "./src/assets/icon/icon.png"
+    },
+    "publish": []
   }
 }
