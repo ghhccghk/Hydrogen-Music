@@ -44,7 +44,9 @@
     "electron-builder": "^26.0.12",
     "nodemon": "^3.1.10",
     "sass": "^1.56.1",
-    "vite": "^7.1.9"
+    "terser": "^5.44.0",
+    "vite": "^7.1.9",
+    "vite-plugin-compression": "^0.5.1"
   },
   "build": {
     "productName": "Hydrogen Music",
@@ -54,7 +56,9 @@
     "directories": {
       "output": "release/${version}"
     },
-    "files": [],
+    "files": [
+    ]
+  ,
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "nsis": {
       "oneClick": false,
@@ -80,7 +84,6 @@
       ],
       "category": "AudioVideo",
       "icon": "./src/assets/icon/icon.png"
-    },
-    "publish": []
+    }
   }
 }
