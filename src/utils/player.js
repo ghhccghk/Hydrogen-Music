@@ -234,7 +234,7 @@ export async function getLocalLyric(filePath) {
 }
 export function setSongToWindows() {
     if(songList.value[currentIndex.value].type != 'local') {
-        coverUrl.value = songList.value[currentIndex.value].al.picUrl + '?param=128y128'
+        coverUrl.value = songList.value[currentIndex.value].al.picUrl
     } else {
         if(!localBase64Img.value) coverUrl.value = null
         else coverUrl.value = localBase64Img.value

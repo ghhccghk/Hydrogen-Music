@@ -56,9 +56,7 @@
     "directories": {
       "output": "release/${version}"
     },
-    "files": [
-    ]
-  ,
+    "files": [],
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "nsis": {
       "oneClick": false,
