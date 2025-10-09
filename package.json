@@ -50,13 +50,25 @@
   },
   "build": {
     "productName": "Hydrogen Music",
-    "appId": "114514",
+    "appId": "com.hydrogenmusic.app",
     "asar": true,
-    "compression": "maximum",
     "directories": {
       "output": "release/${version}"
     },
-    "files": [],
+    "files": [
+      "background.js",
+      "desktop-lyric.html",
+      "index.html",
+      "dist/**/*",
+      "src/assets/icon/**/*",
+      "src/assets/fonts/**/*",
+      "src/electron/**/*",
+      "!**/.DS_Store",
+      "!**/node_modules",
+      "!release/**/*",
+      "!dist-ssr/**/*",
+      "!img/**/*"
+    ],
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "nsis": {
       "oneClick": false,
