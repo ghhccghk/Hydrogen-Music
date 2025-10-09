@@ -1,14 +1,14 @@
 <script setup>
 import { ref, onActivated } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
-import { logout } from '../api/user'
-import { noticeOpen, dialogOpen } from "../utils/dialog";
-import { initSettings } from '../utils/initApp';
-import { getVipInfo } from '../api/user'
-import { isLogin } from '../utils/authority';
-import { useUserStore } from '../store/userStore';
-import { usePlayerStore } from '../store/playerStore';
-import { insertCustomFontStyle } from '../utils/setFont';
+import { logout } from '@/api/user'
+import { noticeOpen, dialogOpen } from "@/utils/dialog";
+import { initSettings } from '@/utils/initApp';
+import { getVipInfo } from '@/api/user'
+import { isLogin } from '@/utils/authority';
+import { useUserStore } from '@/store/userStore';
+import { usePlayerStore } from '@/store/playerStore';
+import { insertCustomFontStyle } from '@/utils/setFont';
 import Selector from '../components/Selector.vue'
 
 const router = useRouter()
@@ -151,6 +151,19 @@ const changeShortcut = (id, type) => {
   }
   windowApi.unregisterShortcuts()
 }
+
+function formatDate(ts) {
+  const date = new Date(ts);
+  const Y = date.getFullYear();
+  const M = String(date.getMonth() + 1).padStart(2, '0');
+  const D = String(date.getDate()).padStart(2, '0');
+  const h = String(date.getHours()).padStart(2, '0');
+  const m = String(date.getMinutes()).padStart(2, '0');
+  const s = String(date.getSeconds()).padStart(2, '0');
+  return `${Y}-${M}-${D} ${h}:${m}:${s}`;
+}
+
+
 /**
  * author: yesplaymusic
  */
@@ -262,8 +275,8 @@ const save = () => {
   initSettings()
   noticeOpen("设置已保存", 2)
 }
-const toGithub = () => {
-  windowApi.toRegister("https://github.com/Kaidesuyo/Hydrogen-Music")
+const toGithub = (text) => {
+  windowApi.toRegister("https://github.com/" + text)
 }
 
 const setCustomFont = () => {
@@ -292,10 +305,10 @@ const setCustomFont = () => {
             <img :src="userStore.user.avatarUrl + '?param=300y300'" alt="">
           </div>
           <div class="user-info">
-            <div class="user-name">{{ userStore.user.nickname }}</div>
+            <div class="user-name">{{ userStore.user.nickname.trim() }}</div>
             <div v-if="vipInfo && userStore.user.vipType != 0" class="user-vip">
               <img :src="vipInfo.associator.dynamicIconUrl" alt="">
-              <div class="vip-expireTime" >到期时间: {{vipInfo.associator.expireTime}}</div>
+              <div class="vip-expireTime" >到期时间: {{formatDate(vipInfo.associator.expireTime)}}</div>
             </div>
           </div>
         </div>
@@ -500,7 +513,8 @@ const setCustomFont = () => {
           <img alt="" src="../assets/icon/icon.ico">
         </div>
         <div class="version">V0.5.0</div>
-        <div class="app-author" @click="toGithub()">Made by Kaidesuyo</div>
+        <div class="app-author" @click='noticeOpen("原作者Github账户已经消失", 2)'>Made by Kaidesuyo</div>
+        <div class="app-author-1" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
       </div>
     </div>
   </div>
@@ -608,6 +622,12 @@ const setCustomFont = () => {
         }
 
         .user-info {
+          display: flex;
+          flex-direction: column; /* 垂直排列昵称和VIP */
+          justify-content: flex-start; /* 从上方开始 */
+          align-items: flex-start; /* 左对齐 */
+          margin-left: 0; /* 确保不偏移 */
+
           .user-name {
             font: 20px Source Han Sans;
             font-weight: bold;
@@ -615,10 +635,9 @@ const setCustomFont = () => {
           }
 
           .user-vip {
+            gap: 4px;
             display: flex;
-            align-items: start;
-            gap: 8px;
-            width: auto;
+            align-items: center;
           }
 
           .user-vip img {
@@ -975,6 +994,17 @@ const setCustomFont = () => {
       }
 
       .app-author {
+        margin-top: 10px;
+        font: 14px Bender-Bold;
+        color: black;
+
+        &:hover {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+      }
+
+      .app-author-1 {
         margin-top: 10px;
         font: 14px Bender-Bold;
         color: black;

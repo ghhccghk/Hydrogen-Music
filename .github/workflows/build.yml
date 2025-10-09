@@ -15,14 +15,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
       - name: Check out git repository
-        uses: actions/checkout@v4  # ✅ 更新为 v4
+        uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v4  # ✅ 更新为 v4
+        uses: actions/setup-node@v4
         with:
           node-version: "23.5.0"
 
@@ -32,28 +32,18 @@ jobs:
       - name: Build Electron App
         run: npm run dist
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
-      - name: Cleanup Artifacts for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          npx rimraf "dist/!(*.exe)"
-
-      - name: Cleanup Artifacts for macOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          npx rimraf "dist/!(*.dmg)"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4  # ✅ 更新为 v4
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}
           path: dist
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2  # ✅ 更新为 v2（v0.1.14 已过时）
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: "dist/**"
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

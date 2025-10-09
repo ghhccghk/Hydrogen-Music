@@ -2,7 +2,7 @@
   import { ref, watch } from 'vue'
   import QRCode from 'qrcode'
   import axios from 'axios';
-  import { songTime2, loadMusicVideo, unloadMusicVideo } from '../utils/player';
+  import { songTime2, loadMusicVideo, unloadMusicVideo } from '@/utils/player';
   import VueSlider from 'vue-slider-component'
   import { dialogOpen, noticeOpen } from '../utils/dialog';
   import { useUserStore } from '../store/userStore';

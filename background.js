@@ -114,7 +114,7 @@ function getTrayIconPath() {
     return path.join(__dirname, './src/assets/icon/icon.ico');
   } else if (process.platform === 'darwin') {
     // macOS
-    return path.join(__dirname, './src/assets/icon/icon.png');
+    return path.join(__dirname, './src/assets/icon/icon.icns');
   } else {
     // Linux
     return path.join(__dirname, './src/assets/icon/icon.png');
