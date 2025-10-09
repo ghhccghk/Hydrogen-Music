@@ -66,9 +66,11 @@ npm start
 ![playlist][playlist-screenshot]
 ![lyric1][lyric1-screenshot]
 ![music_video][music_video-screenshot]
+![setting][setting]
 
 [lyric2-screenshot]: img/lyric2.png
 [home-screenshot]: img/home.png
 [playlist-screenshot]: img/playlist.png
 [lyric1-screenshot]: img/lyric1.png
 [music_video-screenshot]: img/music_video.png
+[setting]: img/setting.png
