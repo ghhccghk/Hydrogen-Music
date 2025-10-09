@@ -29,6 +29,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Install Linux dependencies for pacman build
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bsdtar fakeroot rpm dpkg tar xz-utils
+
+
       - name: Build Electron App
         run: npm run dist
         env:
