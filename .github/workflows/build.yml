@@ -33,7 +33,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y bsdtar fakeroot rpm dpkg tar xz-utils
+          sudo apt-get install -y libarchive-tools fakeroot rpm dpkg tar xz-utils
 
 
       - name: Build Electron App
