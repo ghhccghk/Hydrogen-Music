@@ -1,13 +1,14 @@
 <script setup>
   import { computed } from 'vue'
   import { useRouter } from 'vue-router';
-  import { songTime2 } from '../utils/player';
+  import { songTime2 } from '@/utils/player';
   import VueSlider from 'vue-slider-component'
   import PlayList from './PlayList.vue'
-  import { startMusic, pauseMusic, playLast, playNext, changeProgress, changePlayMode, likeSong } from '../utils/player'
-  import { useUserStore } from '../store/userStore'
-  import { usePlayerStore } from '../store/playerStore'
-  import { useLocalStore } from '../store/localStore';
+  import { startMusic, pauseMusic, playLast, playNext, changeProgress, changePlayMode, likeSong } from '@/utils/player'
+  import { useUserStore } from '@/store/userStore'
+  import { usePlayerStore } from '@/store/playerStore'
+  import { useLocalStore } from '@/store/localStore';
+
   import { storeToRefs } from 'pinia';
   const router = useRouter()
   const userStore = useUserStore()

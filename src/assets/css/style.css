@@ -2,7 +2,6 @@
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   font-weight: 400;
-
   color: rgb(0, 0, 0);
 
   font-synthesis: none;
@@ -10,7 +9,24 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --btn-minimize: #000000;
+  --btn-maximize: #000000;
+  --btn-close: #000000;
 }
+
+.window-control .minimize svg path {
+  fill: var(--btn-minimize);
+}
+
+.window-control .maximize svg path {
+  fill: var(--btn-maximize);
+}
+
+.window-control .close-window svg path {
+  fill: var(--btn-close);
+}
+
 
 a {
   font-weight: 500;

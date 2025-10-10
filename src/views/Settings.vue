@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref, onActivated,watch } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { logout } from '@/api/user'
 import { noticeOpen, dialogOpen } from "@/utils/dialog";
@@ -10,6 +10,7 @@ import { useUserStore } from '@/store/userStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { insertCustomFontStyle } from '@/utils/setFont';
 import Selector from '../components/Selector.vue'
+import { setTheme, getSavedTheme } from '@/utils/theme';
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -63,6 +64,12 @@ const selectedShortcut = ref(null)
 const newShortcut = ref([])
 const shortcutCharacter = ['=', '-', '~', '@', '#', '$', '[', ']', ';', "'", ',', '.', '/', '!'];
 const customFont = ref('')
+const theme = ref('system');
+const themeOptions = ref([
+  { label: '跟随系统', value: 'system' },
+  { label: '浅色', value: 'light' },
+  { label: '深色', value: 'dark' },
+]);
 
 if (isLogin()) {
   getVipInfo().then(result => {
@@ -85,6 +92,15 @@ onActivated(() => {
     quitApp.value = settings.other.quitApp
     customFont.value = settings.other.customFont
   })
+
+  // Initialize theme selection
+  try {
+    theme.value = getSavedTheme();
+  } catch (_) {
+    theme.value = 'system';
+  }
+
+
 })
 
 const setAppSettings = () => {
@@ -110,6 +126,10 @@ const setAppSettings = () => {
   }
   windowApi.setSettings(JSON.stringify(settings))
 }
+
+
+// apply theme immediately when user changes
+watch(theme, (val) => setTheme(val));
 
 onBeforeRouteLeave((to, from, next) => {
   setAppSettings()
@@ -468,6 +488,12 @@ const setCustomFont = () => {
           <div class="line"></div>
           <div class="item-options">
             <div class="option">
+              <div class="option-name">主题</div>
+              <div class="option-operation">
+                <Selector v-model="theme" :options="themeOptions"></Selector>
+              </div>
+            </div>
+            <div class="option">
               <div class="option-name">开启首页页面</div>
               <div class="option-operation">
                 <div class="toggle" @click="userStore.homePage = !userStore.homePage">
@@ -520,79 +546,66 @@ const setCustomFont = () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .settings-page {
   width: 100%;
   height: 100%;
-
   .view-control {
-    margin-bottom: 15Px;
-    margin-left: -8Px;
-    height: 32Px;
+    margin-bottom: 15px;
+    margin-left: -8px;
+    height: 32px;
     display: flex;
     flex-direction: row;
     align-items: center;
-
     svg {
-      padding: 8Px;
-      width: 32Px;
-      height: 32Px;
+      padding: 8px;
+      width: 32px;
+      height: 32px;
       float: left;
       transition: 0.2s;
-
       &:hover {
         cursor: pointer;
         opacity: 0.7;
       }
-
       &:active {
         transform: scale(0.9);
       }
     }
-
     .router-last {
-      margin-right: 5Px;
+      margin-right: 5px;
     }
-
     .setting-title {
-      font: 17Px SourceHanSansCN-Bold;
+      font: 17px SourceHanSansCN-Bold;
       color: black;
-
       .save {
         font-size: 15px;
         padding: 6px;
         background-color: rgba(255, 255, 255, 0.35);
         transition: 0.1s;
-
         &:hover {
           cursor: pointer;
           opacity: 0.8;
         }
-
         &:active {
           opacity: 0.5;
         }
       }
     }
   }
-
   .settings-container {
     margin: 0 auto;
     padding-bottom: 140px;
     width: 80%;
     height: calc(100% - 47px);
     overflow: auto;
-
     &::-webkit-scrollbar {
       display: none;
     }
-
     .settings-title {
       font-family: SourceHanSansCN-Bold;
       color: black;
       text-align: left;
     }
-
     .settings-user-info {
       padding: 10px 40px;
       width: 100%;
@@ -602,38 +615,27 @@ const setCustomFont = () => {
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-
       .user {
         display: flex;
         flex-direction: row;
         align-items: center;
-
         .user-head {
           margin-right: 15px;
           width: 70px;
           height: 70px;
           border-radius: 50%;
           overflow: hidden;
-
           img {
             width: 100%;
             height: 100%;
           }
         }
-
         .user-info {
-          display: flex;
-          flex-direction: column; /* 垂直排列昵称和VIP */
-          justify-content: flex-start; /* 从上方开始 */
-          align-items: flex-start; /* 左对齐 */
-          margin-left: 0; /* 确保不偏移 */
-
           .user-name {
             font: 20px Source Han Sans;
             font-weight: bold;
             color: black;
           }
-
           .user-vip {
             gap: 4px;
             display: flex;
@@ -651,39 +653,32 @@ const setCustomFont = () => {
 
         }
       }
-
       .logout {
-        font: 14Px SourceHanSansCN-Bold;
+        font: 14px SourceHanSansCN-Bold;
         font-weight: bold;
         color: black;
         transition: 0.2s;
-
         &:hover {
           cursor: pointer;
         }
-
         &:active {
           transform: scale(0.95);
         }
       }
     }
-
     .settings {
       width: 100%;
-
       .settings-item {
         margin-top: 45px;
         width: 100%;
-
         .item-title {
           margin: 0;
-          font: 20Px SourceHanSansCN-Bold;
+          font: 20px SourceHanSansCN-Bold;
           color: black;
           font-family: SourceHanSansCN-Bold;
           color: black;
           text-align: left;
         }
-
         .line {
           margin-top: 8px;
           margin-bottom: 25px;
@@ -691,31 +686,27 @@ const setCustomFont = () => {
           height: 0.5px;
           background-color: rgba(0, 0, 0, 0.2);
         }
-
         .item-options {
           outline: none;
-
           .option {
             margin-bottom: 32px;
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
-
             .option-name {
               font-family: SourceHanSansCN-Bold;
               font-size: 16px;
               color: black;
               text-align: left;
             }
-
             input,
             .selector {
               margin-right: 1px;
               width: 200px;
               height: 34px;
               padding: 5px 1px;
-              background-color: rgba(255, 255, 255, 0.35);
+              background-color: transparent;
               color: black;
               border: none;
               outline: none;
@@ -723,35 +714,29 @@ const setCustomFont = () => {
               font: 13px SourceHanSansCN-Bold;
               text-align: center;
               transition: 0.2s;
-
               &:hover {
                 cursor: pointer;
                 opacity: 0.8;
-                box-shadow: 0 0 0 1px black;
+                box-shadow: none;
               }
             }
-
             select {
               padding: 8px 10px;
             }
-
             option {
               background-color: rgba(255, 255, 255, 0.35);
               border: none;
               outline: none;
             }
-
             .toggle {
               margin-right: 1px;
               height: 34px;
               width: 200px;
               position: relative;
               overflow: hidden;
-
               &:hover {
                 cursor: pointer;
               }
-
               .toggle-on,
               .toggle-off {
                 padding: 5px 10px;
@@ -761,11 +746,9 @@ const setCustomFont = () => {
                 transition: 0.2s;
                 line-height: 24px;
               }
-
               .toggle-off {
                 background-color: rgba(255, 255, 255, 0.35);
               }
-
               .toggle-on {
                 background-color: black;
                 position: absolute;
@@ -773,32 +756,27 @@ const setCustomFont = () => {
                 left: 0;
                 z-index: -1;
               }
-
               .toggle-on-in {
                 color: white;
                 background-color: transparent;
               }
             }
-
             .button {
               margin-right: 1px;
               padding: 5px 10px;
               width: 200px;
               background-color: rgba(255, 255, 255, 0.35);
               font: 13px SourceHanSansCN-Bold;
-
               &:hover {
                 cursor: pointer;
                 opacity: 0.8;
                 box-shadow: 0 0 0 1px black;
               }
             }
-
             .select-download-folder {
               display: flex;
               flex-direction: row;
               align-items: center;
-
               .selected-folder {
                 width: 50vw;
                 height: 30px;
@@ -808,7 +786,6 @@ const setCustomFont = () => {
                 line-height: 30px;
                 overflow: hidden;
               }
-
               .select-option {
                 margin-right: 2px;
                 margin-left: 15px;
@@ -817,7 +794,6 @@ const setCustomFont = () => {
                 color: black;
                 background-color: rgba(255, 255, 255, 0.35);
                 transition: 0.2s;
-
                 &:hover {
                   cursor: pointer;
                   opacity: 0.8;
@@ -825,16 +801,13 @@ const setCustomFont = () => {
                 }
               }
             }
-
             .local-folder {
               display: flex;
               flex-direction: row;
               align-items: center;
-
               .selected-local-folder-item {
                 display: flex;
                 flex-direction: column;
-
                 .selected-folder {
                   margin-bottom: 10px;
                   width: 50vw;
@@ -845,14 +818,12 @@ const setCustomFont = () => {
                   line-height: 30px;
                   overflow: hidden;
                 }
-
                 .tip {
                   font: 10px SourceHanSansCN-Bold;
                   color: black;
                   text-align: left;
                 }
               }
-
               .add-option {
                 margin-right: 2px;
                 margin-left: 15px;
@@ -861,13 +832,6 @@ const setCustomFont = () => {
                 color: black;
                 background-color: rgba(255, 255, 255, 0.35);
                 transition: 0.2s;
-
-                &.selected {
-                  color: white;
-                  background-color: black;
-                  box-shadow: 0 0 0 1px black;
-                }
-
                 &:hover {
                   cursor: pointer;
                   opacity: 0.8;
@@ -875,25 +839,11 @@ const setCustomFont = () => {
                 }
               }
             }
-
-            .custom-font {
-              .custom-font-path {
-                width: 50vw;
-                height: 30px;
-                background-color: rgba(255, 255, 255, 0.35);
-                font: 13px SourceHanSansCN-Bold;
-                color: black;
-                line-height: 30px;
-                overflow: hidden;
-              }
-            }
           }
-
           .forbid-shortcuts {
             opacity: 0.5;
             pointer-events: none;
           }
-
           .shortcuts-title {
             font: 14px SourceHanSansCN-Bold;
             color: black;
@@ -901,22 +851,18 @@ const setCustomFont = () => {
             flex-direction: row;
             align-items: center;
             text-align: left;
-
             div {
               margin-right: 15px;
               padding: 0 6px;
             }
-
             .title-function {
               min-width: 130px;
             }
-
             .title-shortcuts,
             .title-globalShortcuts {
               min-width: 200px;
             }
           }
-
           .shortcuts {
             font: 14px SourceHanSansCN-Bold;
             color: black;
@@ -926,33 +872,27 @@ const setCustomFont = () => {
             flex-direction: row;
             align-items: center;
             text-align: left;
-
             div {
               margin-top: 15px;
               margin-right: 15px;
               padding: 6px;
               background-color: rgba(255, 255, 255, 0.35);
             }
-
             .shortcut-name {
               min-width: 130px;
               background-color: transparent;
             }
-
             .shortcut,
             .globalShortcut {
               min-width: 200px;
-
               &:hover {
                 cursor: pointer;
               }
             }
-
             .shortcut-selected {
               box-shadow: 0 0 0 1px black;
             }
           }
-
           .default-shortcuts {
             margin-top: 15px;
             margin-left: 1px;
@@ -962,7 +902,6 @@ const setCustomFont = () => {
             font: 14px SourceHanSansCN-Bold;
             transition: 0.2s;
             color: black;
-
             &:hover {
               cursor: pointer;
               box-shadow: 0 0 0 1px black;
@@ -971,44 +910,59 @@ const setCustomFont = () => {
         }
       }
     }
-
     .app-version {
       display: flex;
       flex-direction: column;
       align-items: center;
-
       .app-icon {
         margin-bottom: 10px;
         width: 65px;
         height: 65px;
-
         img {
           width: 100%;
           height: 100%;
         }
       }
-
       .version {
         font: 14px Geometos;
         color: black;
       }
+      .update-check {
+        margin: 8px 0;
 
+        .check-update-btn {
+          padding: 5px 15px;
+          background-color: rgba(255, 255, 255, 0.35);
+          color: black;
+          border: none;
+          border-radius: 0;
+          outline: none;
+          font: 13px SourceHanSansCN-Bold;
+          cursor: pointer;
+          transition: 0.2s;
+
+          &:hover {
+            opacity: 0.8;
+            box-shadow: 0 0 0 1px black;
+          }
+
+          &:focus {
+            outline: none;
+            border-radius: 0;
+            box-shadow: 0 0 0 1px black;
+          }
+
+          &:active {
+            outline: none;
+            border-radius: 0;
+            box-shadow: 0 0 0 1px black;
+          }
+        }
+      }
       .app-author {
         margin-top: 10px;
         font: 14px Bender-Bold;
         color: black;
-
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-
-      .app-author-1 {
-        margin-top: 10px;
-        font: 14px Bender-Bold;
-        color: black;
-
         &:hover {
           cursor: pointer;
           text-decoration: underline;
@@ -1017,14 +971,12 @@ const setCustomFont = () => {
     }
   }
 }
-
 .toggle-enter-active,
 .toggle-leave-active {
   transition: 0.1s;
 }
-
 .toggle-enter-from,
 .toggle-leave-to {
-  transform: translateX(-100%)
+  transform: translateX(-100%);
 }
 </style>
