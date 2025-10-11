@@ -36,8 +36,7 @@
     padding: 95Px 45Px 60Px 45Px;
     width: 100%;
     height: 100%;
-    background: linear-gradient(rgba(176, 209, 217, 0.9) -20%,rgba(176, 209, 217, 0.4) 50%,rgba(176, 209, 217, 0.9) 120%);
-    background-color: rgb(255, 255, 255);
+    background: rgb(255, 255, 255) linear-gradient(rgba(176, 209, 217, 0.9) -20%, rgba(176, 209, 217, 0.4) 50%, rgba(176, 209, 217, 0.9) 120%);
     display: flex;
     flex-direction: row;
     align-items: center;
