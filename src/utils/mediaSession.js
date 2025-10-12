@@ -134,6 +134,26 @@ export function initMediaSession() {
       changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
       updatePositionThrottled({ force: true })
     })
+    // // ----------------------
+    // // 自定义控制：循环 / 音量 / 播放模式
+    // // mediaSession 内置只有部分 action，我们可以利用 seekbackward / seekforward / stop 做自定义
+    // // ----------------------
+    // navigator.mediaSession.setActionHandler('seekbackward', () => {
+    //   // 音量减
+    //   playerStore.volume = Math.max(playerStore.volume - 0.1, 0);
+    // });
+    //
+    // navigator.mediaSession.setActionHandler('seekforward', () => {
+    //   // 音量加
+    //   playerStore.volume = Math.min(playerStore.volume + 0.1, 1);
+    // });
+    //
+    // navigator.mediaSession.setActionHandler('stop', () => {
+    //   // 切换循环模式：off -> on -> one -> off
+    //   const nextLoopMode = (playerStore.playMode + 1) % 4; // 0顺序 1列表循环 2单曲循环 3随机
+    //   playerStore.playMode = nextLoopMode;
+    // });
+
   } catch (_) {}
 
   // Static strategy

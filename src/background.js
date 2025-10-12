@@ -1,16 +1,16 @@
-const startNeteaseMusicApi = require('./src/electron/services')
-const IpcMainEvent = require('./src/electron/ipcMain')
-const MusicDownload = require('./src/electron/download')
-const LocalFiles = require('./src/electron/localmusic')
-const InitTray = require('./src/electron/tray')
-const registerShortcuts = require('./src/electron/shortcuts')
+const startNeteaseMusicApi = require('./electron/services')
+const IpcMainEvent = require('./electron/ipcMain')
+const MusicDownload = require('./electron/download')
+const LocalFiles = require('./electron/localmusic')
+const InitTray = require('./electron/tray')
+const registerShortcuts = require('./electron/shortcuts')
 
 const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
 const Winstate = require('electron-win-state').default
 const {autoUpdater} = require("electron-updater");
 const path = require('path')
 const Store = require('electron-store');
-const {isCreateMpris} = require("./src/utils/platform");
+const {isCreateMpris} = require("./utils/platform");
 const settingsStore = new Store({name: 'settings'});
 
 let myWindow = null

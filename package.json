@@ -2,7 +2,7 @@
   "name": "hydrogenmusic",
   "private": true,
   "version": "0.5.0",
-  "main": "background.js",
+  "main": "src/background.js",
   "author": {
     "name": "ghhccghk",
     "email": "2137610394@qq.com"
