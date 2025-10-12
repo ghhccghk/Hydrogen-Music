@@ -1,5 +1,5 @@
 <template>
-    <div class="arknights-desktop-lyric" :class="{ draggable: !locked, 'native-drag': isMac && !locked }" @contextmenu.prevent.stop="showContextMenu" @click="handleClick" @mousedown="onDragStart">
+    <div class="arknights-desktop-lyric" :class="{ draggable: !locked, 'native-drag': isMac && !locked || isLinux }" @contextmenu.prevent.stop="showContextMenu" @click="handleClick" @mousedown="onDragStart">
         <!-- 背景层 -->
         <div class="background-layers">
             <div class="bg-layer bg-primary"></div>
@@ -335,8 +335,9 @@ const applyLyricAutoExpand = async () => {
 
 // 平台检测：Windows/Linux 走 JS 拖拽，macOS 保持原生 drag
 const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-const isMac = /Macintosh|Mac OS X|MacOS|Darwin/i.test(ua);
-const isWinOrLinux = !isMac && /(Windows|Linux|X11|Wayland)/i.test(ua);
+const isMac = /Macintosh|Mac OS X|MacOS|Darwin|Linux|X11|Wayland/i.test(ua);
+const isLinux = /Linux|X11|Wayland/i.test(ua);
+const isWinOrLinux = !isMac && /(Windows)/i.test(ua);
 
 // 拖拽控制（仅 Windows/Linux 启用纯 JS 移动窗口）
 const isDragging = ref(false);

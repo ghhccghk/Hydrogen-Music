@@ -5,14 +5,17 @@ const LocalFiles = require('./src/electron/localmusic')
 const InitTray = require('./src/electron/tray')
 const registerShortcuts = require('./src/electron/shortcuts')
 
-const {app, BrowserWindow, globalShortcut} = require('electron')
+const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
 const Winstate = require('electron-win-state').default
 const {autoUpdater} = require("electron-updater");
 const path = require('path')
 const Store = require('electron-store');
+const {isCreateMpris} = require("./src/utils/platform");
 const settingsStore = new Store({name: 'settings'});
 
 let myWindow = null
+let lyricWindow = null
+let forceQuit = false;
 //electron单例
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -50,6 +53,10 @@ if (!gotTheLock) {
     // 注销所有快捷键
     globalShortcut.unregisterAll()
   })
+
+  app.on('before-quit', () => {
+    forceQuit = true;
+  });
 }
 const createWindow = () => {
   // 设置应用名称（在开发模式下也生效）
@@ -134,7 +141,7 @@ const createWindow = () => {
 
   })
   //ipcMain初始化
-  IpcMainEvent(win, app)
+  IpcMainEvent(win, app, { createLyricWindow, closeLyricWindow, setLyricWindowMovable, getLyricWindow: () => lyricWindow })
   MusicDownload(win)
   LocalFiles(win, app)
   InitTray(win, app, path.resolve(__dirname, iconPath))
@@ -150,6 +157,114 @@ function getTrayIconPath() {
   } else {
     // Linux
     return path.join(__dirname, './src/assets/icon/icon.png');
+  }
+}
+
+// 创建桌面歌词窗口
+const createLyricWindow = () => {
+  if (lyricWindow) {
+    lyricWindow.focus()
+    return lyricWindow
+  }
+
+  const lyricWin = new BrowserWindow({
+    width: 500,
+    height: 350,
+    minWidth: 500,
+    minHeight: 250,
+    maxWidth: 900,
+    maxHeight: 500,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: true,
+    movable: true,
+    minimizable: false,
+    maximizable: false,
+    closable: true,
+    // 保持可交互，但避免全屏干扰
+    focusable: true,
+    show: false,
+    backgroundColor: 'transparent',
+    webPreferences: {
+      preload: path.resolve(__dirname, './src/electron/preload.js'),
+      webSecurity: false,
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  })
+
+  lyricWindow = lyricWin
+
+  const lyricHtml = path.join(process.env.DIST, 'dist/desktop-lyric.html')
+  if (process.resourcesPath.indexOf('\\node_modules\\') != -1) {
+    lyricWin.loadURL('http://localhost:5173/desktop-lyric.html')
+  } else {
+    lyricWin.loadFile(lyricHtml)
+  }
+
+  // Windows/UWP: 提升置顶效果的工具方法（无需管理员权限）
+  const bumpTopMost = () => {
+    try {
+      // 再次声明置顶，提高 Z 序
+      lyricWin.setAlwaysOnTop(true)
+      // 若可用，进一步将窗口移至最上层（Windows 支持）
+      if (typeof lyricWin.moveTop === 'function') {
+        lyricWin.moveTop()
+      }
+    } catch (_) { }
+  }
+
+  lyricWin.once('ready-to-show', () => {
+    lyricWin.show()
+    // macOS: 提高层级，覆盖全屏和 Space（忽略异常以兼容跨平台）
+    try { lyricWin.setAlwaysOnTop(true, 'screen-saver') } catch (_) { }
+    // 可见后小延时再次顶置，规避某些 UWP 抢焦点导致的抢占
+    setTimeout(() => bumpTopMost(), 50)
+  })
+
+  // 添加备用显示逻辑，防止ready-to-show事件不触发
+  setTimeout(() => {
+    if (lyricWin && !lyricWin.isDestroyed() && !lyricWin.isVisible()) {
+      lyricWin.show()
+    }
+    // 再次顶置，确保在慢速环境中仍能覆盖
+    bumpTopMost()
+  }, 2000)
+
+  lyricWin.on('closed', () => {
+    lyricWindow = null
+  })
+
+  lyricWin.setMenu(null)
+
+  // 监听关键事件并在 Windows 上重新顶置
+  if (process.platform === 'win32') {
+    const reboundEvents = ['show', 'focus', 'blur', 'resize', 'move', 'restore']
+    reboundEvents.forEach(evt => {
+      lyricWin.on(evt, () => bumpTopMost())
+    })
+    // 当主窗口获得/失去焦点时也尝试顶置一次（减少被 UWP 挤压的概率）
+    if (myWindow) {
+      myWindow.on('focus', () => bumpTopMost())
+      myWindow.on('blur', () => bumpTopMost())
+    }
+  }
+
+  return lyricWin
+}
+
+const closeLyricWindow = () => {
+  if (lyricWindow) {
+    lyricWindow.close()
+    lyricWindow = null
+  }
+}
+
+const setLyricWindowMovable = (movable) => {
+  if (lyricWindow) {
+    lyricWindow.setMovable(movable)
   }
 }
 

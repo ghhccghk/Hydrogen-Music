@@ -26,12 +26,14 @@ export const usePlayerStore = defineStore('playerStore', {
             tlyricSize: null,
             rlyricSize: null,
             lyricType: ['original'],
+            currentLyricIndex: -1, // 当前歌词索引，用于桌面歌词同步
             lyricInterludeTime: null, //歌词间奏等待时间
             lyricShow: false, //歌词是否显示
             lyricEle: null,//歌词DOM
             isLyricDelay: true, //调整进度的时候禁止赋予delay属性
             localBase64Img: null, //如果是本地歌曲，获取封面
             forbidLastRouter: false, //在主动跳转router时禁用回到上次离开的路由的地址功能
+            isDesktopLyricOpen: true, // 桌面歌词是否打开
             musicVideo: false,
             addMusicVideo: false,
             currentMusicVideo: null,

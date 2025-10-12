@@ -32,7 +32,7 @@ function updateWindowTitleDock() {
     const cur = curList[idx]
     if (!cur) {
       // 无当前歌曲，恢复默认标题
-      windowApi.setWindowTile('Hydrogen Music')
+      window.windowApi.setWindowTile('Hydrogen Music')
       return
     }
     const sName = cur.name || cur.localName || 'Hydrogen Music'
@@ -41,10 +41,10 @@ function updateWindowTitleDock() {
     const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''
     const isMac = /Mac/i.test(platform)
     if (isMac) {
-      windowApi.updateDockMenu({ name: sName, artist: aName })
+      window.windowApi.updateDockMenu({ name: sName, artist: aName })
     } else {
       const title = aName ? `${sName} - ${aName}` : sName
-      windowApi.setWindowTile(title)
+      window.windowApi.setWindowTile(title)
     }
   } catch (e) {
     // 保底不抛错
@@ -72,7 +72,7 @@ export function checkAndLoadVideoForCurrentSong() {
   }
 
   // 立即检查当前歌曲是否有对应的视频文件
-  windowApi.musicVideoIsExists({ id: songId.value, method: 'verify' }).then(result => {
+  window.windowApi.musicVideoIsExists({ id: songId.value, method: 'verify' }).then(result => {
     // 验证歌曲ID是否仍然匹配（防止快速切歌）
     if (result && result !== '404' && result !== false && result.data &&
       result.data.path && result.data.id === songId.value &&
@@ -166,7 +166,7 @@ export function isVideoClosedByUser(songId) {
 
 export function loadLastSong() {
   if (loadLast) {
-    windowApi.getLastPlaylist().then(list => {
+    window.windowApi.getLastPlaylist().then(list => {
       if (list) {
         songList.value = list.songList
         shuffledList.value = list.shuffledList
@@ -291,7 +291,7 @@ export function play(url, autoplay, resumeSeek = null) {
 
       // 原有的播放结束逻辑（非FM模式）
       if (playMode.value == 0 && currentIndex.value < songList.value.length - 1) { playNext(); return } //顺序播放
-      if (playMode.value == 0 && currentIndex.value == songList.value.length - 1) { playing.value = false; playModeOne = true; windowApi.playOrPauseMusicCheck(playing.value); return } //顺序播放结束暂停状态
+      if (playMode.value == 0 && currentIndex.value == songList.value.length - 1) { playing.value = false; playModeOne = true; window.windowApi.playOrPauseMusicCheck(playing.value); return } //顺序播放结束暂停状态
       if (playMode.value == 1) { playNext(); return } //列表循环
       if (playMode.value == 3) { playNext() } //随机播放(为列表循环)
       if (playMode.value == 2) { clearLycAnimation() } // 单曲循环播放结束时清除歌词动画
@@ -320,20 +320,21 @@ export function play(url, autoplay, resumeSeek = null) {
       window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
         detail: { duration: Math.floor(currentMusic.value.duration() || 0), toTime: progress.value || 0 }
       }))
+
     } catch (_) {}
   })
   currentMusic.value.on('play', () => {
     currentMusic.value.fade(0, volume.value, 200)
     startProgress()
     playing.value = true
-    windowApi.playOrPauseMusicCheck(playing.value)
+    window.windowApi.playOrPauseMusicCheck(playing.value)
     // 切歌/播放开始时统一更新窗口标题与（macOS）Dock 菜单
     updateWindowTitleDock()
   })
   currentMusic.value.on('pause', () => {
     clearInterval(musicProgress)
     playing.value = false
-    windowApi.playOrPauseMusicCheck(playing.value)
+    window.windowApi.playOrPauseMusicCheck(playing.value)
     currentMusic.value.fade(volume.value, 0, 200)
   })
 }
@@ -487,7 +488,7 @@ export function loadMusicVideo(id) {
 
   // 等待一个短暂的时间确保清理完成，然后检查视频
   setTimeout(() => {
-    windowApi.musicVideoIsExists({ id: id, method: 'verify' }).then(result => {
+    window.windowApi.musicVideoIsExists({ id: id, method: 'verify' }).then(result => {
       // 严格检查 - 只有明确返回有效结果且文件存在时才加载视频
       if (result && result !== '404' && result !== false && result.data && result.data.path && result.data.id === id) {
         // 再次验证当前歌曲ID是否仍然匹配（防止快速切歌导致的异步问题）
@@ -561,7 +562,7 @@ export function setSongLevel(level) {
   songList.value[currentIndex.value].quality = level
 }
 export async function getLocalLyric(filePath) {
-  const lyric = await windowApi.getLocalMusicLyric(filePath)
+  const lyric = await window.windowApi.getLocalMusicLyric(filePath)
   if (lyric) return lyric
   else return false
 }
@@ -647,15 +648,15 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
   const isMac = /Mac/i.test(platform)
   if (isMac) {
     // 更新 Dock 菜单（仅在 macOS 上）
-    windowApi.updateDockMenu({ name: songName, artist: artistName })
+    window.windowApi.updateDockMenu({ name: songName, artist: artistName })
   } else {
     // 更新窗口标题（Windows/Linux）
     const title = artistName ? `${songName} - ${artistName}` : songName
-    windowApi.setWindowTile(title)
+    window.windowApi.setWindowTile(title)
   }
 
   if (isLocal) {
-    windowApi.getLocalMusicImage(songList.value[currentIndex.value].url).then(base64 => {
+    window.windowApi.getLocalMusicImage(songList.value[currentIndex.value].url).then(base64 => {
       localBase64Img.value = base64
       // 本地封面到达后，提示 Media Session 刷新一次元数据（以载入封面）
       try { window.dispatchEvent(new CustomEvent('mediaSession:updateArtwork')) } catch (_) {}
@@ -911,7 +912,7 @@ export function changePlayMode() {
     shuffledList.value = null
     shuffleIndex.value = null
   }
-  windowApi.changeTrayMusicPlaymode(playMode.value)
+  window.windowApi.changeTrayMusicPlaymode(playMode.value)
 }
 
 export function playAll(listType, list) {
@@ -1129,7 +1130,7 @@ export function savePlaylist() {
     songList: songList.value,
     shuffledList: shuffledList.value
   }
-  windowApi.saveLastPlaylist(JSON.stringify(list))
+  window.windowApi.saveLastPlaylist(JSON.stringify(list))
 }
 export function songTime(dt) {
   if (dt) {
@@ -1262,15 +1263,15 @@ window.addEventListener('click', (e) => {
   else if (otherStore.videoIsBlur && otherStore.videoPlayerShow && document.getElementById('videoPlayer').contains(e.target) == true && document.getElementsByClassName('plyr__controls')[0].contains(e.target) != true) otherStore.videoIsBlur = false
   if (userStore.appOptionShow && document.getElementsByClassName('user-head')[0].contains(e.target) != true) userStore.appOptionShow = false
 })
-windowApi.playOrPauseMusic((event) => {
+window.windowApi.playOrPauseMusic((event) => {
   if (playing.value) pauseMusic()
   else startMusic()
 })
-windowApi.lastOrNextMusic((event, option) => {
+window.windowApi.lastOrNextMusic((event, option) => {
   if (option == 'last') playLast()
   else if (option == 'next') playNext()
 })
-windowApi.changeMusicPlaymode((event, mode) => {
+window.windowApi.changeMusicPlaymode((event, mode) => {
   if (playMode.value != mode) playMode.value = mode
   if (playMode.value == 2) currentMusic.value.loop(true) //循环模式
   else currentMusic.value.loop(false)
@@ -1281,17 +1282,17 @@ windowApi.changeMusicPlaymode((event, mode) => {
     shuffleIndex.value = null
   }
 })
-windowApi.volumeUp(() => {
+window.windowApi.volumeUp(() => {
   if (volume.value + 0.1 < 1) volume.value += 0.1
   else volume.value = 1
   currentMusic.value.volume(volume.value)
 })
-windowApi.volumeDown(() => {
+window.windowApi.volumeDown(() => {
   if (volume.value - 0.1 > 0) volume.value -= 0.1
   else volume.value = 0
   currentMusic.value.volume(volume.value)
 })
-windowApi.musicProcessControl((event, mode) => {
+window.windowApi.musicProcessControl((event, mode) => {
   if (mode == 'forward') {
     if (progress.value + 3 < currentMusic.value.duration()) progress.value += 3
     else progress.value = currentMusic.value.duration()
@@ -1302,14 +1303,30 @@ windowApi.musicProcessControl((event, mode) => {
   // 统一使用 changeProgress，确保歌词、视频等状态同步
   changeProgress(progress.value)
 })
-windowApi.playOrPauseMusicCheck(playing.value)
-windowApi.changeTrayMusicPlaymode(playMode.value)
-windowApi.beforeQuit(() => {
+window.windowApi.playOrPauseMusicCheck(playing.value)
+window.windowApi.changeTrayMusicPlaymode(playMode.value)
+window.windowApi.beforeQuit(() => {
   //关闭之前清除下载管理中的状态
-  windowApi.downloadPause('shutdown')
+  window.windowApi.downloadPause('shutdown')
   let list = {
     songList: songList.value,
     shuffledList: shuffledList.value
   }
-  windowApi.exitApp(JSON.stringify(list))
+  window.windowApi.exitApp(JSON.stringify(list))
 })
+
+
+// if ('mediaSession' in navigator) {
+//   navigator.mediaSession.setActionHandler('previoustrack', () => {
+//     playLast()
+//   });
+//   navigator.mediaSession.setActionHandler('nexttrack', () => {
+//     playNext()
+//   });
+//   navigator.mediaSession.setActionHandler('play', () => {
+//     startMusic();
+//   });
+//   navigator.mediaSession.setActionHandler('pause', () => {
+//     pauseMusic()
+//   });
+// }

@@ -11,7 +11,8 @@ export default defineConfig({
     target: 'es2018', // 更新到ES2018以支持async generator functions
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html')
+        main: resolve(__dirname, 'index.html'),
+        'desktop-lyric': resolve(__dirname, 'desktop-lyric.html')
       },
       output: {
         // 手动代码分割，优化加载性能
