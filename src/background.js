@@ -61,7 +61,7 @@ if (!gotTheLock) {
 const createWindow = () => {
   // 设置应用名称（在开发模式下也生效）
   app.setName('Hydrogen Music')
-  process.env.DIST = path.join(__dirname, './')
+  process.env.DIST = path.join(__dirname, '../')
   const indexHtml = path.join(process.env.DIST, 'dist/index.html')
   const winstate = new Winstate({
     //自定义默认窗口大小
@@ -74,14 +74,14 @@ const createWindow = () => {
     minHeight: 672,
     frame: false,
     title: "Hydrogen Music",
-    icon: path.resolve(__dirname, './src/assets/icon/' + (process.platform === 'win32' ? 'icon.ico' : 'icon.png')),
+    icon: path.resolve(__dirname, './assets/icon/' + (process.platform === 'win32' ? 'icon.ico' : 'icon.png')),
     backgroundColor: '#fff',
     //记录窗口大小
     ...winstate.winOptions,
     show: false,
     webPreferences: {
       //预加载脚本
-      preload: path.resolve(__dirname, './src/electron/preload.js'),
+      preload: path.resolve(__dirname, './electron/preload.js'),
       webSecurity: false,
     }
   })
@@ -150,13 +150,13 @@ const createWindow = () => {
 
 function getTrayIconPath() {
   if (process.platform === 'win32') {
-    return path.join(__dirname, './src/assets/icon/icon.ico');
+    return path.join(__dirname, './assets/icon/icon.ico');
   } else if (process.platform === 'darwin') {
     // macOS
-    return path.join(__dirname, './src/assets/icon/icon.icns');
+    return path.join(__dirname, './assets/icon/icon.icns');
   } else {
     // Linux
-    return path.join(__dirname, './src/assets/icon/icon.png');
+    return path.join(__dirname, './assets/icon/icon.png');
   }
 }
 
@@ -188,7 +188,7 @@ const createLyricWindow = () => {
     show: false,
     backgroundColor: 'transparent',
     webPreferences: {
-      preload: path.resolve(__dirname, './src/electron/preload.js'),
+      preload: path.resolve(__dirname, './electron/preload.js'),
       webSecurity: false,
       nodeIntegration: false,
       contextIsolation: true
