@@ -304,7 +304,6 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            flex: 0;          /* ❗防止 flex 自动拉伸 */
             width: auto;      /* 根据内容变化 */
             max-width: 100%;  /* 避免超出屏幕 */
             svg{
