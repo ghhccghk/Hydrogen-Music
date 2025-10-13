@@ -16,8 +16,6 @@
   import { usePlayerStore } from './store/playerStore';
   import { useOtherStore } from './store/otherStore';
 
-  import { initMprisBridge } from '@/utils/ipcMpris';
-
   const playerStore = usePlayerStore();
   const otherStore = useOtherStore();
 

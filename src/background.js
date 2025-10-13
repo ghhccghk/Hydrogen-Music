@@ -11,6 +11,7 @@ const {autoUpdater} = require("electron-updater");
 const path = require('path')
 const Store = require('electron-store');
 const {isCreateMpris} = require("./utils/platform");
+const {createMpris} = require("./electron/mpris");
 const settingsStore = new Store({name: 'settings'});
 
 let myWindow = null
@@ -31,6 +32,10 @@ if (!gotTheLock) {
   })
 
   app.whenReady().then(async () => {
+    process.on('uncaughtException', (err) => {
+      console.error('捕获到未处理异常:', err)
+    })
+
     //api初始化
     try {
       await startNeteaseMusicApi();  // 等待 API 启动
@@ -146,6 +151,19 @@ const createWindow = () => {
   LocalFiles(win, app)
   InitTray(win, app, path.resolve(__dirname, iconPath))
   registerShortcuts(win)
+
+  // disable chromium mpris
+  if (isCreateMpris) {
+    app.commandLine.appendSwitch(
+      'disable-features',
+      'HardwareMediaKeyHandling,MediaSessionService'
+    );
+  }
+
+  // create mpris
+  if (isCreateMpris) {
+    createMpris(win);
+  }
 }
 
 function getTrayIconPath() {

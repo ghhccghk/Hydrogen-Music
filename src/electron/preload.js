@@ -157,6 +157,16 @@ function openNeteaseLogin() {
 function clearLoginSession() {
   return ipcRenderer.invoke('clear-login-session')
 }
+
+function sendMetaData(metadata) {
+  ipcRenderer.send('metadata', metadata);
+}
+
+function sendPlayerCurrentTrackTime(t) {
+  ipcRenderer.send("playerCurrentTrackTime", t)
+}
+
+
 contextBridge.exposeInMainWorld('windowApi', {
   windowMin,
   windowMax,
@@ -250,26 +260,28 @@ contextBridge.exposeInMainWorld('electronAPI', {
 })
 
 contextBridge.exposeInMainWorld('playerApi', {
-  // 播放 / 暂停
-  setPlaying: (playing) => ipcRenderer.send('player', { playing }),
-
-  // 更新当前曲目元数据
-  setMetadata: (metadata) => ipcRenderer.send('metadata', metadata),
-
-  // 更新当前播放进度
-  setCurrentTrackTime: (position) => ipcRenderer.send('playerCurrentTrackTime', position),
-
-  // 用户手动 seek
-  seek: (position) => ipcRenderer.send('seeked', position),
-
   // 切换循环模式
   switchRepeatMode: (mode) => ipcRenderer.send('switchRepeatMode', mode), // mode: 'off' | 'one' | 'on'
 
   // 切换随机播放
   switchShuffle: (shuffle) => ipcRenderer.send('switchShuffle', shuffle), // shuffle: true/false
+  sendMetaData,
+  sendPlayerCurrentTrackTime,
+  onSetPosition: (callback) => {
+    ipcRenderer.on('setPosition', (_, positionUs) => {
+      callback(positionUs)
+    })
+  },
+  onNext: (callback) => ipcRenderer.on('next', callback),
+  onPrevious: (callback) => ipcRenderer.on('previous', callback),
+  onPlayM: (callback) => ipcRenderer.on('play', callback),
+  onPlayPause: (callback) => ipcRenderer.on('playpause', callback),
+  onPauseM: (callback) => ipcRenderer.on('pause', callback),
+  onRepeat: (callback) => ipcRenderer.on('repeat', callback),
+  onShuffle: (callback) => ipcRenderer.on('shuffle', callback),
 });
 
-contextBridge.exposeInMainWorld('electronAPItest', {
-  send: (channel, data) => ipcRenderer.send(channel, data),
-  on: (channel, callback) => ipcRenderer.on(channel, (event, data) => callback(data))
-});
+// 这里安全地暴露必要的接口
+contextBridge.exposeInMainWorld('process', {
+  platform: process.platform,
+})

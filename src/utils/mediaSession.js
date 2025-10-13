@@ -1,8 +1,9 @@
 import pinia from '../store/pinia'
 import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { usePlayerStore } from '../store/playerStore'
+import {usePlayerStore} from '@/store/playerStore'
 import { startMusic, pauseMusic, playNext, playLast, changeProgress } from './player'
+import {isCreateMpris} from "@/utils/platform";
 
 function getCurrentTrack(storeRefs) {
   const { songList, currentIndex } = storeRefs
@@ -68,6 +69,7 @@ export function initMediaSession() {
       }
       // 允许 duration 为 0 用于“换曲瞬间归零”，随后真正时长会在加载完成时刷新
       navigator.mediaSession.setPositionState({ duration, position, playbackRate: 1.0 })
+      playerApi.sendPlayerCurrentTrackTime(position)
       lastDur = duration
       lastPos = position
       lastTs = Date.now()
@@ -100,8 +102,33 @@ export function initMediaSession() {
     let artwork = getArtworkForTrack(cur, localBase64Img.value)
     if (isMac && artwork && artwork.length > 1) artwork = [artwork[0]]
     try {
-      navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album, artwork })
-    } catch (_) {}
+      const metadata = {
+        title: title,
+        artUrl: artist,
+        artist: artist,
+        album: album,
+        artwork: [
+          {
+            src: cur.al.picUrl + '?param=224y224',
+            type: 'image/jpg',
+            sizes: '224x224',
+          },
+          {
+            src: cur.al.picUrl + '?param=512y512',
+            type: 'image/jpg',
+            sizes: '512x512',
+          },
+        ],
+        length: Number(time.value) || 10
+      };
+
+      navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
+      if (isCreateMpris) {
+        playerApi.sendMetaData(metadata);
+      }
+    } catch (e) {
+      console.log(e)
+    }
     updatePlaybackState()
     // 换曲瞬间：强制把位置归零，避免系统控件保留上一首进度
     updatePosition({ forceZero: true })

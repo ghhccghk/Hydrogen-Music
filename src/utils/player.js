@@ -891,6 +891,7 @@ export function changeProgressByDragEnd(toTime) {
 }
 // ------------
 export function changePlayMode() {
+  //0为顺序播放，1为列表循环，2为单曲循环，3为随机播放
   // FM模式下的特殊切换逻辑：只在模式2（单曲循环）和模式3（随机播放）之间切换
   if (listInfo.value && listInfo.value.type === 'personalfm') {
     if (playMode.value == 2) {
@@ -912,6 +913,23 @@ export function changePlayMode() {
     shuffledList.value = null
     shuffleIndex.value = null
   }
+
+  // 通知 MPRIS 循环模式
+  switch (playMode.value) {
+    case 0: // 顺序播放
+    case 3: // 随机播放
+      window.playerApi.switchRepeatMode('off')
+      break
+    case 1: // 列表循环
+      window.playerApi.switchRepeatMode('on')
+      break
+    case 2: // 单曲循环
+      window.playerApi.switchRepeatMode('one')
+      break
+  }
+
+  // 通知 MPRIS 随机状态
+  window.playerApi.switchShuffle(playMode.value === 3)
   window.windowApi.changeTrayMusicPlaymode(playMode.value)
 }
 
@@ -1282,6 +1300,7 @@ window.windowApi.changeMusicPlaymode((event, mode) => {
     shuffleIndex.value = null
   }
 })
+
 window.windowApi.volumeUp(() => {
   if (volume.value + 0.1 < 1) volume.value += 0.1
   else volume.value = 1
@@ -1314,6 +1333,50 @@ window.windowApi.beforeQuit(() => {
   }
   window.windowApi.exitApp(JSON.stringify(list))
 })
+window.playerApi.onSetPosition((positionSeconds) => {
+  changeProgress(positionSeconds)
+})
+window.playerApi.onPlayPause(() => {
+  if (playing.value) pauseMusic()
+  else startMusic()
+})
+
+// 播放下一首
+window.playerApi.onNext(() => {
+  playNext() // 你自己实现的渲染端播放下一首逻辑
+})
+
+// 播放上一首
+window.playerApi.onPrevious(() => {
+  playLast()
+})
+
+// 播放/暂停
+window.playerApi.onPlayM(() => {
+  startMusic()
+})
+window.playerApi.onPauseM(() => {
+  pauseMusic()
+})
+
+//循环模式切换
+window.playerApi.onRepeat(() => {
+  changePlayMode()
+})
+
+// 随机播放切换
+window.playerApi.onShuffle(() => {
+  if (playMode.value !== 3) {
+    playMode.value = 3
+    setShuffledList()
+  } else {
+    playMode.value = 0
+    shuffledList.value = null
+    shuffleIndex.value = null
+  }
+  window.playerApi.switchShuffle(playMode.value === 3)
+})
+
 
 
 // if ('mediaSession' in navigator) {
