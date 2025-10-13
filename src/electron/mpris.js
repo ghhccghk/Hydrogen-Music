@@ -21,6 +21,10 @@ export function createMpris(window) {
   );
   player.on('loopStatus', () => renderer.send('repeat'));
   player.on('shuffle', () => renderer.send('shuffle'));
+  // 当外部通过 MPRIS 改变音量时触发
+  player.on('volume', (value) => {
+    renderer.send('volume_changed', value);
+  })
 
   ipcMain.on('music-playing-check', (e, playing) => {
     player.playbackStatus = playing
@@ -67,9 +71,13 @@ export function createMpris(window) {
   });
 
   ipcMain.on('switchShuffle', (e, shuffle) => {
-    console.log(shuffle);
     player.shuffle = shuffle;
   });
+
+  ipcMain.on('setVolume', (e, volume) => {
+    player.volume = volume;
+  });
+
 }
 
 export async function createDbus(window) {

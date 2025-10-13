@@ -10,6 +10,7 @@ import { useLibraryStore } from '@/store/libraryStore'
 import { useOtherStore } from '@/store/otherStore'
 import { storeToRefs } from 'pinia'
 import {isCreateMpris} from "@/utils/platform";
+import {watch} from "vue";
 
 const otherStore = useOtherStore()
 const userStore = useUserStore()
@@ -17,7 +18,6 @@ const libraryStore = useLibraryStore(pinia)
 const playerStore = usePlayerStore(pinia)
 const { libraryInfo } = storeToRefs(libraryStore)
 const { currentMusic, playing, progress, volume, quality, playMode, songList, shuffledList, shuffleIndex, listInfo, songId, currentIndex, time, playlistWidgetShow, playerChangeSong, lyric, lyricsObjArr, lyricShow, lyricEle, isLyricDelay, widgetState, localBase64Img, musicVideo, currentMusicVideo, musicVideoDOM, videoIsPlaying, playerShow, lyricBlur, currentLyricIndex } = storeToRefs(playerStore)
-
 let isProgress = false
 let musicProgress = null
 let loadLast = true
@@ -25,6 +25,11 @@ let playModeOne = false //为true代表顺序播放已全部结束
 let refreshingStream = false
 let lastRefreshAttempt = 0
 
+if (isCreateMpris) {
+  watch(volume, (v) => {
+    window.playerApi?.setVolume?.(v)
+  })
+}
 // 统一更新窗口标题和（macOS）Dock菜单
 function updateWindowTitleDock() {
   try {
@@ -1268,24 +1273,12 @@ export function musicVideoCheck(seek, update) {
   }
 }
 
-// 冻结 MediaSession（防止冲突）
-function freezeMediaSession() {
-  if (typeof navigator === 'undefined' || !navigator.mediaSession) return
-  try {
-    console.log('[MediaSession] 已冻结')
-    navigator.mediaSession.metadata = null
-    const actions = [
-      'play', 'pause', 'stop',
-      'previoustrack', 'nexttrack',
-      'seekbackward', 'seekforward', 'seekto'
-    ]
-    for (const action of actions) {
-      navigator.mediaSession.setActionHandler(action, null)
-    }
-  } catch (err) {
-    console.warn('[MediaSession] 冻结失败', err)
-  }
+function setVolume(value) {
+  volume.value = Math.max(0, Math.min(1, value))
+  console.log(volume.value)
+  currentMusic.value.volume(volume.value)
 }
+
 
 
 window.addEventListener('mousedown', (e) => {
@@ -1407,3 +1400,8 @@ window.playerApi.onShuffle(() => {
   }
   window.playerApi.switchShuffle(playMode.value === 3)
 })
+
+window.playerApi.onVolumeChanged((v) => {
+    setVolume(v)
+  }
+)

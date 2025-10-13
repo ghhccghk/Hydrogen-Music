@@ -279,6 +279,10 @@ contextBridge.exposeInMainWorld('playerApi', {
   onPauseM: (callback) => ipcRenderer.on('pause', callback),
   onRepeat: (callback) => ipcRenderer.on('repeat', callback),
   onShuffle: (callback) => ipcRenderer.on('shuffle', callback),
+  setVolume: (volume) => ipcRenderer.send('setVolume', volume),
+  onVolumeChanged: (callback) => ipcRenderer.on('volume_changed', (_, volume) => {
+    callback(volume)
+  }),
 });
 
 // 这里安全地暴露必要的接口
