@@ -50,7 +50,9 @@ export function initMediaSession() {
 
   const updatePlaybackState = () => {
     try {
-      navigator.mediaSession.playbackState = playing.value ? 'playing' : 'paused'
+      if (!isCreateMpris) {
+        navigator.mediaSession.playbackState = playing.value ? 'playing' : 'paused'
+      }
     } catch (_) {}
   }
 
@@ -68,8 +70,11 @@ export function initMediaSession() {
         position = 0
       }
       // 允许 duration 为 0 用于“换曲瞬间归零”，随后真正时长会在加载完成时刷新
-      navigator.mediaSession.setPositionState({ duration, position, playbackRate: 1.0 })
-      playerApi.sendPlayerCurrentTrackTime(position)
+      if (!isCreateMpris) {
+        navigator.mediaSession.setPositionState({duration, position, playbackRate: 1.0})
+      } else {
+        playerApi.sendPlayerCurrentTrackTime(position)
+      }
       lastDur = duration
       lastPos = position
       lastTs = Date.now()
@@ -122,9 +127,11 @@ export function initMediaSession() {
         length: Number(time.value) || 10
       };
 
-      navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
+
       if (isCreateMpris) {
         playerApi.sendMetaData(metadata);
+      } else {
+        navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
       }
     } catch (e) {
       console.log(e)
@@ -138,48 +145,43 @@ export function initMediaSession() {
 
   // Initial registration of action handlers (SMTC hooks)
   try {
-    navigator.mediaSession.setActionHandler('play', () => { startMusic(); updatePlaybackState(); updatePositionThrottled({ force: true }) })
-    navigator.mediaSession.setActionHandler('pause', () => { pauseMusic(); updatePlaybackState(); updatePositionThrottled({ force: true }) })
-    navigator.mediaSession.setActionHandler('previoustrack', () => playLast())
-    navigator.mediaSession.setActionHandler('nexttrack', () => playNext())
-    navigator.mediaSession.setActionHandler('stop', () => { pauseMusic(); updatePlaybackState(); updatePositionThrottled({ force: true }) })
-    navigator.mediaSession.setActionHandler('seekto', (details) => {
-      if (details && typeof details.seekTime === 'number') {
-        changeProgress(Math.max(0, Math.min(details.seekTime, Number(time.value) || 0)))
-        updatePositionThrottled({ force: true })
-      }
-    })
-    navigator.mediaSession.setActionHandler('seekforward', (details) => {
-      const offset = (details && details.seekOffset) || 5
-      const pos = (Number(progress.value) || 0) + offset
-      changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
-      updatePositionThrottled({ force: true })
-    })
-    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-      const offset = (details && details.seekOffset) || 5
-      const pos = (Number(progress.value) || 0) - offset
-      changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
-      updatePositionThrottled({ force: true })
-    })
-    // // ----------------------
-    // // 自定义控制：循环 / 音量 / 播放模式
-    // // mediaSession 内置只有部分 action，我们可以利用 seekbackward / seekforward / stop 做自定义
-    // // ----------------------
-    // navigator.mediaSession.setActionHandler('seekbackward', () => {
-    //   // 音量减
-    //   playerStore.volume = Math.max(playerStore.volume - 0.1, 0);
-    // });
-    //
-    // navigator.mediaSession.setActionHandler('seekforward', () => {
-    //   // 音量加
-    //   playerStore.volume = Math.min(playerStore.volume + 0.1, 1);
-    // });
-    //
-    // navigator.mediaSession.setActionHandler('stop', () => {
-    //   // 切换循环模式：off -> on -> one -> off
-    //   const nextLoopMode = (playerStore.playMode + 1) % 4; // 0顺序 1列表循环 2单曲循环 3随机
-    //   playerStore.playMode = nextLoopMode;
-    // });
+    if (!isCreateMpris) {
+      navigator.mediaSession.setActionHandler('play', () => {
+        startMusic();
+        updatePlaybackState();
+        updatePositionThrottled({force: true})
+      })
+      navigator.mediaSession.setActionHandler('pause', () => {
+        pauseMusic();
+        updatePlaybackState();
+        updatePositionThrottled({force: true})
+      })
+      navigator.mediaSession.setActionHandler('previoustrack', () => playLast())
+      navigator.mediaSession.setActionHandler('nexttrack', () => playNext())
+      navigator.mediaSession.setActionHandler('stop', () => {
+        pauseMusic();
+        updatePlaybackState();
+        updatePositionThrottled({force: true})
+      })
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details && typeof details.seekTime === 'number') {
+          changeProgress(Math.max(0, Math.min(details.seekTime, Number(time.value) || 0)))
+          updatePositionThrottled({force: true})
+        }
+      })
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        const offset = (details && details.seekOffset) || 5
+        const pos = (Number(progress.value) || 0) + offset
+        changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
+        updatePositionThrottled({force: true})
+      })
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        const offset = (details && details.seekOffset) || 5
+        const pos = (Number(progress.value) || 0) - offset
+        changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
+        updatePositionThrottled({force: true})
+      })
+    }
 
   } catch (_) {}
 
@@ -195,16 +197,45 @@ export function initMediaSession() {
 
   // 3) 监听渲染层的显式 seek/加载完成事件，以便精准刷新一次
   try {
-    window.addEventListener('mediaSession:seeked', (e) => {
-      const detail = (e && e.detail) || {}
-      const duration = typeof detail.duration === 'number' ? detail.duration : Number(time.value) || 0
-      const position = typeof detail.toTime === 'number' ? detail.toTime : Number(progress.value) || 0
-      updatePosition({ override: { duration, position } })
-    })
-    // 本地音乐封面异步到达后，补一次 metadata（仅当当前曲目未切换）
-    window.addEventListener('mediaSession:updateArtwork', () => {
-      // 仅刷新 metadata，不动 position，避免产生闪烁；macOS 下只更新一次 artwork
-      updateMetadata()
-    })
+    if (!isCreateMpris) {
+      window.addEventListener('mediaSession:seeked', (e) => {
+        const detail = (e && e.detail) || {}
+        const duration = typeof detail.duration === 'number' ? detail.duration : Number(time.value) || 0
+        const position = typeof detail.toTime === 'number' ? detail.toTime : Number(progress.value) || 0
+        updatePosition({override: {duration, position}})
+      })
+      // 本地音乐封面异步到达后，补一次 metadata（仅当当前曲目未切换）
+      window.addEventListener('mediaSession:updateArtwork', () => {
+        // 仅刷新 metadata，不动 position，避免产生闪烁；macOS 下只更新一次 artwork
+        updateMetadata()
+      })
+    }
   } catch (_) {}
 }
+
+
+function freezeMediaSession() {
+  if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
+
+  try {
+    // 清空现有
+    navigator.mediaSession.metadata = null
+    for (const a of [
+      'play', 'pause', 'stop', 'previoustrack', 'nexttrack',
+      'seekbackward', 'seekforward', 'seekto'
+    ]) {
+      navigator.mediaSession.setActionHandler(a, null)
+    }
+
+    // 冻结属性，防止再被赋值
+    Object.defineProperty(navigator, 'mediaSession', {
+      value: null,
+      writable: false,
+      configurable: false
+    })
+    console.log('[MediaSession] 已冻结')
+  } catch (err) {
+    console.warn('[MediaSession] 冻结失败', err)
+  }
+}
+

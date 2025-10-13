@@ -9,6 +9,7 @@ import { usePlayerStore } from '@/store/playerStore'
 import { useLibraryStore } from '@/store/libraryStore'
 import { useOtherStore } from '@/store/otherStore'
 import { storeToRefs } from 'pinia'
+import {isCreateMpris} from "@/utils/platform";
 
 const otherStore = useOtherStore()
 const userStore = useUserStore()
@@ -317,9 +318,11 @@ export function play(url, autoplay, resumeSeek = null) {
     playerChangeSong.value = false
     // 通知 Media Session：新曲目加载完成，刷新一次系统时长/进度（静态策略）
     try {
-      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-        detail: { duration: Math.floor(currentMusic.value.duration() || 0), toTime: progress.value || 0 }
-      }))
+      if (!isCreateMpris) {
+        window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+          detail: {duration: Math.floor(currentMusic.value.duration() || 0), toTime: progress.value || 0}
+        }))
+      }
 
     } catch (_) {}
   })
@@ -522,9 +525,11 @@ export function addSong(id, index, autoplay, isLocal) {
   try { localBase64Img.value = null } catch (_) {}
   // 立即通知 SMTC/Media Session 将进度归零，避免保留上一首的时间轴
   try {
-    window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-      detail: { duration: 0, toTime: 0 }
-    }))
+    if (!isCreateMpris) {
+      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+        detail: {duration: 0, toTime: 0}
+      }))
+    }
   } catch (_) {}
   if (lyricShow.value) {
     lyricShow.value = false
@@ -659,7 +664,12 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
     window.windowApi.getLocalMusicImage(songList.value[currentIndex.value].url).then(base64 => {
       localBase64Img.value = base64
       // 本地封面到达后，提示 Media Session 刷新一次元数据（以载入封面）
-      try { window.dispatchEvent(new CustomEvent('mediaSession:updateArtwork')) } catch (_) {}
+      try {
+        if (!isCreateMpris) {
+          window.dispatchEvent(new CustomEvent('mediaSession:updateArtwork'))
+        }
+      } catch (_) {
+      }
     })
     const filePath = songList.value[currentIndex.value].url.replace(/\\/g, '/')
     const fileUrl = filePath.startsWith('file://')
@@ -876,9 +886,11 @@ export function changeProgress(toTime) {
   currentMusic.value.seek(toTime)
   // 静态策略下，仅在显式 seek 时通知一次系统进度
   try {
-    window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-      detail: { duration: Math.floor(time.value || 0), toTime }
-    }))
+    if (!isCreateMpris) {
+      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+        detail: {duration: Math.floor(time.value || 0), toTime}
+      }))
+    }
   } catch (_) {}
 }
 //控制拖拽进度条
@@ -1256,6 +1268,25 @@ export function musicVideoCheck(seek, update) {
   }
 }
 
+// 冻结 MediaSession（防止冲突）
+function freezeMediaSession() {
+  if (typeof navigator === 'undefined' || !navigator.mediaSession) return
+  try {
+    console.log('[MediaSession] 已冻结')
+    navigator.mediaSession.metadata = null
+    const actions = [
+      'play', 'pause', 'stop',
+      'previoustrack', 'nexttrack',
+      'seekbackward', 'seekforward', 'seekto'
+    ]
+    for (const action of actions) {
+      navigator.mediaSession.setActionHandler(action, null)
+    }
+  } catch (err) {
+    console.warn('[MediaSession] 冻结失败', err)
+  }
+}
+
 
 window.addEventListener('mousedown', (e) => {
   if (e.target.parentNode.parentNode.id == 'widget-progress') {
@@ -1376,20 +1407,3 @@ window.playerApi.onShuffle(() => {
   }
   window.playerApi.switchShuffle(playMode.value === 3)
 })
-
-
-
-// if ('mediaSession' in navigator) {
-//   navigator.mediaSession.setActionHandler('previoustrack', () => {
-//     playLast()
-//   });
-//   navigator.mediaSession.setActionHandler('nexttrack', () => {
-//     playNext()
-//   });
-//   navigator.mediaSession.setActionHandler('play', () => {
-//     startMusic();
-//   });
-//   navigator.mediaSession.setActionHandler('pause', () => {
-//     pauseMusic()
-//   });
-// }

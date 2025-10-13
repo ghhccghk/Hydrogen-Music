@@ -31,6 +31,15 @@ if (!gotTheLock) {
     }
   })
 
+  // disable chromium mpris
+  if (isCreateMpris) {
+    app.commandLine.appendSwitch(
+      'disable-features',
+      'HardwareMediaKeyHandling,MediaSessionService'
+    );
+  }
+
+
   app.whenReady().then(async () => {
     process.on('uncaughtException', (err) => {
       console.error('捕获到未处理异常:', err)
@@ -151,14 +160,6 @@ const createWindow = () => {
   LocalFiles(win, app)
   InitTray(win, app, path.resolve(__dirname, iconPath))
   registerShortcuts(win)
-
-  // disable chromium mpris
-  if (isCreateMpris) {
-    app.commandLine.appendSwitch(
-      'disable-features',
-      'HardwareMediaKeyHandling,MediaSessionService'
-    );
-  }
 
   // create mpris
   if (isCreateMpris) {
