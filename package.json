@@ -58,7 +58,7 @@
       "output": "release/${version}"
     },
     "files": [
-      "background.js",
+      "src/background.js",
       "desktop-lyric.html",
       "index.html",
       "dist/**/*",
