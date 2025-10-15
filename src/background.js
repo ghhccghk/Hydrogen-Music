@@ -4,14 +4,14 @@ const MusicDownload = require('./electron/download')
 const LocalFiles = require('./electron/localmusic')
 const InitTray = require('./electron/tray')
 const registerShortcuts = require('./electron/shortcuts')
+const {isCreateMpris} = require('./utils/platform');
+const {createMpris} = require('./electron/mpris');
 
 const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
 const Winstate = require('electron-win-state').default
 const {autoUpdater} = require("electron-updater");
 const path = require('path')
 const Store = require('electron-store');
-const {isCreateMpris} = require("./utils/platform");
-const {createMpris} = require("./electron/mpris");
 const settingsStore = new Store({name: 'settings'});
 
 let myWindow = null
