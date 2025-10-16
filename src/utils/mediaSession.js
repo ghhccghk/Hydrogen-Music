@@ -213,29 +213,3 @@ export function initMediaSession() {
   } catch (_) {}
 }
 
-
-function freezeMediaSession() {
-  if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
-
-  try {
-    // 清空现有
-    navigator.mediaSession.metadata = null
-    for (const a of [
-      'play', 'pause', 'stop', 'previoustrack', 'nexttrack',
-      'seekbackward', 'seekforward', 'seekto'
-    ]) {
-      navigator.mediaSession.setActionHandler(a, null)
-    }
-
-    // 冻结属性，防止再被赋值
-    Object.defineProperty(navigator, 'mediaSession', {
-      value: null,
-      writable: false,
-      configurable: false
-    })
-    console.log('[MediaSession] 已冻结')
-  } catch (err) {
-    console.warn('[MediaSession] 冻结失败', err)
-  }
-}
-
