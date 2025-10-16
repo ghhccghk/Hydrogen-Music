@@ -19,7 +19,6 @@
     "axios": "^1.12.2",
     "base64-js": "^1.5.1",
     "dayjs": "^1.11.18",
-    "dbus-next": "^0.10.2",
     "electron-store": "^11.0.2",
     "electron-updater": "^6.6.2",
     "electron-win-state": "^1.1.22",
@@ -39,6 +38,9 @@
     "vue-router": "^4.6.3",
     "vue-slider-component": "^4.1.0-beta.6",
     "vue-virtual-scroller": "^2.0.0-beta.8"
+  },
+  "optionalDependencies": {
+    "dbus-next": "^0.10.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
