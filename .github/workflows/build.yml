@@ -26,15 +26,33 @@ jobs:
         with:
           node-version: "23.5.0"
 
-      - name: Install Dependencies
-        run: npm install
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Configure npm Python path
+        run: npm config set python $(which python3)
+
+
+      - name: Configure Python for Windows
+        if: runner.os == 'Windows'
+        run: |
+          npm config set python "C:\\hostedtoolcache\\windows\\Python\\3.11.*/x64/python.exe"
+           echo "PYTHON=C:\\hostedtoolcache\\windows\\Python\\3.11.*/x64/python.exe" >> $env:GITHUB_ENV   
 
       - name: Install Linux dependencies for pacman build
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libarchive-tools fakeroot rpm dpkg tar xz-utils
+          sudo apt-get install -y libarchive-tools fakeroot rpm dpkg tar xz-utils build-essential
 
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Rebuild native modules for Electron
+        run: npx electron-rebuild
 
       - name: Build Electron App
         run: npm run dist
