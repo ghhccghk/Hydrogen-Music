@@ -1,10 +1,3 @@
-let dbus = null;
-
-if (process.platform === 'linux') {
-  dbus = await import('dbus-next');
-} else {
-  console.log('Skipping dbus-next on non-Linux');
-}
 import {ipcMain, app} from 'electron';
 import Player from "mpris-service";
 
@@ -84,27 +77,4 @@ export function createMpris(window) {
     player.volume = volume;
   });
 
-}
-
-export async function createDbus(window) {
-  const bus = dbus.sessionBus();
-  const Variant = dbus.Variant;
-
-  const osdService = await bus.getProxyObject(
-    'org.osdlyrics.Daemon',
-    '/org/osdlyrics/Lyrics'
-  );
-
-  const osdInterface = osdService.getInterface('org.osdlyrics.Lyrics');
-
-  ipcMain.on('sendLyrics', async (e, {track, lyrics}) => {
-    const metadata = {
-      title: new Variant('s', track.name),
-      artist: new Variant('s', track.ar.map(ar => ar.name).join(', ')),
-    };
-
-    await osdInterface.SetLyricContent(metadata, Buffer.from(lyrics));
-
-    window.webContents.send('saveLyricFinished');
-  });
 }
