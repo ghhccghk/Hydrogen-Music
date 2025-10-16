@@ -11,7 +11,7 @@ const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
 const Winstate = require('electron-win-state').default
 const {autoUpdater} = require("electron-updater");
 const path = require('path')
-const Store = require('electron-store');
+const Store = require('electron-store').default;
 const settingsStore = new Store({name: 'settings'});
 
 let myWindow = null

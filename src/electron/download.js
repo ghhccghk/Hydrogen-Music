@@ -1,6 +1,6 @@
 const { ipcMain } = require("electron");
 const path = require("path");
-const Store = require("electron-store");
+const Store = require("electron-store").default;
 const { nanoid } = require('nanoid')
 module.exports = MusicDownload = (win) => {
     const settingsStore = new Store({ name: "settings" });

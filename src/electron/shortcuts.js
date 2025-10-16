@@ -1,5 +1,5 @@
 const { Menu, globalShortcut } = require('electron')
-const Store = require('electron-store');
+const Store = require('electron-store').default;
 
 module.exports = async function registerShortcuts(win) {
     const settingsStore = new Store({name: 'settings'});
