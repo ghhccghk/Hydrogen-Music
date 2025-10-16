@@ -32,10 +32,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Configure npm Python path
-        run: npm config set python $(which python3)
-
-
       - name: Configure Python for Windows
         if: runner.os == 'Windows'
         run: |
