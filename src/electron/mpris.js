@@ -1,9 +1,9 @@
 let dbus = null;
 
 if (process.platform === 'linux') {
-  dbus = require('dbus-next');  // 仅 Linux 加载
+  dbus = await import('dbus-next');
 } else {
-  console.log('Skipping dbus-next: not on Linux');
+  console.log('Skipping dbus-next on non-Linux');
 }
 import {ipcMain, app} from 'electron';
 import Player from "mpris-service";
