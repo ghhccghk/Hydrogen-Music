@@ -50,9 +50,7 @@ export function initMediaSession() {
 
   const updatePlaybackState = () => {
     try {
-      if (!isCreateMpris) {
-        navigator.mediaSession.playbackState = playing.value ? 'playing' : 'paused'
-      }
+      navigator.mediaSession.playbackState = playing.value ? 'playing' : 'paused'
     } catch (_) {}
   }
 
@@ -60,7 +58,6 @@ export function initMediaSession() {
   const updatePosition = (opts = {}) => {
     const { forceZero = false, override } = opts || {}
     try {
-      if (typeof navigator.mediaSession.setPositionState !== 'function') return
       let duration = Number(time.value) || 0
       let position = Number(progress.value) || 0
       if (override && typeof override.duration === 'number') duration = override.duration
@@ -70,14 +67,13 @@ export function initMediaSession() {
         position = 0
       }
       // 允许 duration 为 0 用于“换曲瞬间归零”，随后真正时长会在加载完成时刷新
-      if (!isCreateMpris) {
-        navigator.mediaSession.setPositionState({duration, position, playbackRate: 1.0})
-      } else {
-        playerApi.sendPlayerCurrentTrackTime(position)
-      }
+
+      playerApi.sendPlayerCurrentTrackTime(progress.value)
       lastDur = duration
       lastPos = position
       lastTs = Date.now()
+      if (typeof navigator.mediaSession.setPositionState !== 'function') return
+      navigator.mediaSession.setPositionState({duration, position, playbackRate: 1.0})
     } catch (_) {}
   }
 
@@ -126,15 +122,10 @@ export function initMediaSession() {
         ],
         length: Number(time.value) || 10
       };
-
-
-      if (isCreateMpris) {
-        playerApi.sendMetaData(metadata);
-      } else {
-        navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
-      }
+      playerApi.sendMetaData(metadata);
+      navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
     } catch (e) {
-      console.log(e)
+      console.log("mediaSession,metadata" + e)
     }
     updatePlaybackState()
     // 换曲瞬间：强制把位置归零，避免系统控件保留上一首进度
@@ -145,7 +136,6 @@ export function initMediaSession() {
 
   // Initial registration of action handlers (SMTC hooks)
   try {
-    if (!isCreateMpris) {
       navigator.mediaSession.setActionHandler('play', () => {
         startMusic();
         updatePlaybackState();
@@ -181,7 +171,6 @@ export function initMediaSession() {
         changeProgress(Math.max(0, Math.min(pos, Number(time.value) || 0)))
         updatePositionThrottled({force: true})
       })
-    }
 
   } catch (_) {}
 
@@ -197,7 +186,6 @@ export function initMediaSession() {
 
   // 3) 监听渲染层的显式 seek/加载完成事件，以便精准刷新一次
   try {
-    if (!isCreateMpris) {
       window.addEventListener('mediaSession:seeked', (e) => {
         const detail = (e && e.detail) || {}
         const duration = typeof detail.duration === 'number' ? detail.duration : Number(time.value) || 0
@@ -209,7 +197,6 @@ export function initMediaSession() {
         // 仅刷新 metadata，不动 position，避免产生闪烁；macOS 下只更新一次 artwork
         updateMetadata()
       })
-    }
   } catch (_) {}
 }
 

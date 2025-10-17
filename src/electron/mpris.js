@@ -1,10 +1,4 @@
-let dbus = null;
-
-if (process.platform === 'linux') {
-  dbus = await import('dbus-next');
-} else {
-  console.log('Skipping dbus-next on non-Linux');
-}
+import dbus from 'dbus-next';
 import {ipcMain, app} from 'electron';
 import Player from "mpris-service";
 

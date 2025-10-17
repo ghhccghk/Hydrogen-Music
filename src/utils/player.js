@@ -25,11 +25,10 @@ let playModeOne = false //为true代表顺序播放已全部结束
 let refreshingStream = false
 let lastRefreshAttempt = 0
 
-if (isCreateMpris) {
-  watch(volume, (v) => {
-    window.playerApi?.setVolume?.(v)
-  })
-}
+watch(volume, (v) => {
+  window.playerApi?.setVolume?.(v)
+})
+
 // 统一更新窗口标题和（macOS）Dock菜单
 function updateWindowTitleDock() {
   try {
