@@ -44,8 +44,10 @@ jobs:
         run: |
           brew install dbus pkg-config
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install Dependencies and Audit Fix
+        run: |
+          npm install
+          npm audit fix
 
       - name: Rebuild native modules for Electron
         run: npx electron-rebuild
