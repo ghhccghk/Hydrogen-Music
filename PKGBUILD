@@ -1,6 +1,6 @@
 # Maintainer: ghhccghk <2137610394@qq.com>
 pkgname=hydrogenmusic-git
-pkgver=0.5.0
+pkgver=0.5.0.r36
 pkgrel=1
 _pkgver=0.5.0
 pkgdesc="Hydrogen Music - Modern music player built with Electron + Vite"
@@ -23,12 +23,13 @@ pkgver() {
 build() {
     cd "$srcdir/Hydrogen-Music"
     npm install --ignore-scripts --no-audit --no-fund
-    vite build && electron-builder --linux pacman
+    npm run build
+    npx electron-builder --linux pacman
 }
 
 package() {
     cd "$srcdir/Hydrogen-Music/release/$_pkgver"
-    tar -xvf "Hydrogen Music-${pkgver}-linux.pacman" -C ${pkgdir}
+    tar -xvf "Hydrogen Music-${_pkgver}-linux.pacman" -C ${pkgdir}
     # Remove exsiting files
     rm -f ${pkgdir}/.PKGINFO ${pkgdir}/.MTREE ${pkgdir}/.INSTALL
     # Make KDE happy :)
