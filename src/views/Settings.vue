@@ -540,7 +540,7 @@ const setCustomFont = () => {
         </div>
         <div class="version">V0.5.0</div>
         <div class="app-author" @click='noticeOpen("原作者Github账户已经消失", 2)'>Made by Kaidesuyo</div>
-        <div class="app-author-1" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
+        <div class="app-author" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
       </div>
     </div>
   </div>
