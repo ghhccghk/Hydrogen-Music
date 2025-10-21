@@ -21,7 +21,6 @@
 
   onMounted(() => {
     initDesktopLyric();
-    // initMprisBridge();
   });
 
   windowApi.checkUpdate((event, version) => {

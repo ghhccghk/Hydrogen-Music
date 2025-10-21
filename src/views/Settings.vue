@@ -631,6 +631,12 @@ const setCustomFont = () => {
           }
         }
         .user-info {
+          display: flex;
+          flex-direction: column; /* 垂直排列昵称和VIP */
+          justify-content: flex-start; /* 从上方开始 */
+          align-items: flex-start; /* 左对齐 */
+          margin-left: 0; /* 确保不偏移 */
+
           .user-name {
             font: 20px Source Han Sans;
             font-weight: bold;

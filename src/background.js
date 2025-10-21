@@ -4,7 +4,7 @@ const MusicDownload = require('./electron/download')
 const LocalFiles = require('./electron/localmusic')
 const InitTray = require('./electron/tray')
 const registerShortcuts = require('./electron/shortcuts')
-const {isCreateMpris} = require('./utils/platform');
+const {isCreateMpris, isLinux} = require('./utils/platform');
 const {createMpris} = require('./electron/mpris');
 
 const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
@@ -48,9 +48,12 @@ if (!gotTheLock) {
     console.log("openHEVC error:" + e)
   }
 
-  app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations')
-  app.commandLine.appendSwitch('ozone-platform', 'wayland')
-
+  // const settings = await settingsStore.get('settings');
+  //
+  // if (isLinux && ){
+  //   app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations')
+  //   app.commandLine.appendSwitch('ozone-platform', 'wayland')
+  // }
   app.whenReady().then(async () => {
     process.on('uncaughtException', (err) => {
       console.error('捕获到未处理异常:', err)
