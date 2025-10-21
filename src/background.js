@@ -39,6 +39,17 @@ if (!gotTheLock) {
     );
   }
 
+  // 尝试启用平台 HEVC 硬件解码（在支持的平台上）
+  try {
+    app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport')
+    // 某些平台可能需要忽略 GPU 黑名单以启用硬件解码
+    app.commandLine.appendSwitch('ignore-gpu-blocklist')
+  } catch (e) {
+    console.log("openHEVC error:" + e)
+  }
+
+  app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations')
+  app.commandLine.appendSwitch('ozone-platform', 'wayland')
 
   app.whenReady().then(async () => {
     process.on('uncaughtException', (err) => {

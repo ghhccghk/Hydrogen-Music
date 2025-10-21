@@ -1,11 +1,18 @@
 <script setup>
-import { ref, watch } from 'vue';
+import {ref, watch, computed} from 'vue';
 import QRCode from 'qrcode';
-import { songTime2, loadMusicVideo, unloadMusicVideo, pauseCurrentMusicVideo, reopenCurrentMusicVideo } from '@/utils/player';
+import axios from 'axios';
+import {
+  songTime2,
+  loadMusicVideo,
+  unloadMusicVideo,
+  pauseCurrentMusicVideo,
+  reopenCurrentMusicVideo
+} from '../utils/player';
 import VueSlider from 'vue-slider-component';
-import { dialogOpen, noticeOpen } from '@/utils/dialog';
-import { useUserStore } from '@/store/userStore';
-import { usePlayerStore } from '@/store/playerStore';
+import {dialogOpen, noticeOpen} from '../utils/dialog';
+import {useUserStore} from '../store/userStore';
+import {usePlayerStore} from '../store/playerStore';
 import { storeToRefs } from 'pinia';
 
 const userStore = useUserStore();
@@ -313,11 +320,32 @@ const addVideo = async flag => {
   console.log(currentVideoInfo.value);
   console.log(selectedInfo.value);
   let urlIndex = selectedInfo.value.qn - (currentVideoInfo.value.quality.length - currentVideoInfo.value.video.length / 2)
-  if(urlIndex < 0) urlIndex = 0
-  console.log(urlIndex);
+  if (urlIndex < 0) urlIndex = 0
+  console.log(urlIndex)
+
+  // 优先选择 AVC 编码的视频源（若同清晰度存在 avc 与 hevc）
+  let videoList = currentVideoInfo.value.video || []
+  let chosen = videoList[urlIndex] || videoList[0]
+  if (!chosen && videoList.length === 0) {
+    noticeOpen('未获取到可下载的视频源', 2)
+    isDownloading.value = false
+    return
+  }
+  // 在相同清晰度（相同 id）里优先选择 avc1
+  try {
+    const targetId = chosen && chosen.id
+    const avcCandidate = videoList.find(v => v && v.id === targetId && v.codecs && v.codecs.toLowerCase().includes('avc1'))
+    if (avcCandidate) chosen = avcCandidate
+  } catch (e) {
+    console.warn('选择AVC候选源时出错，使用默认源:', e)
+  }
+
+  const finalUrl = chosen.baseUrl || chosen.base_url
+  const finalCodec = (chosen.codecs || '').toLowerCase()
+
   windowApi
     .getBiliVideo({
-      url: currentVideoInfo.value.video[urlIndex].baseUrl,
+      url: finalUrl,
       option: {
         headers: headers,
         params: {
@@ -326,6 +354,7 @@ const addVideo = async flag => {
           cid: selectedInfo.value.part,
           quality: selectedInfo.value.quality,
           qn: selectedInfo.value.qn,
+          codec: finalCodec,
           timing: JSON.stringify(timingList.value),
         },
       },

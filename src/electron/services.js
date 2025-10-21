@@ -1,4 +1,4 @@
-const server = require('@neteaseapireborn/api')
+const server = require('@neteasecloudmusicapienhanced/api')
 
 //启动网易云音乐API
 module.exports = async function startNeteaseMusicApi() {
