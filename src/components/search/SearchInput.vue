@@ -1,8 +1,8 @@
 <script setup>
   import { ref } from 'vue'
   import { useRouter } from 'vue-router';
-  import { noticeOpen } from '../utils/dialog';
-  import { usePlayerStore } from '../store/playerStore';
+  import {noticeOpen} from '../../utils/dialog';
+  import {usePlayerStore} from '../../store/playerStore';
   const playerStore = usePlayerStore()
   const router = useRouter()
 

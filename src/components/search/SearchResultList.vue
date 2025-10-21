@@ -1,7 +1,7 @@
 <script setup>
   import { useRouter } from 'vue-router';
-  import { usePlayerStore } from '../store/playerStore';
-  import { useOtherStore } from '../store/otherStore';
+  import {usePlayerStore} from '../../store/playerStore';
+  import {useOtherStore} from '../../store/otherStore';
 
   const router = useRouter()
   const playerStore = usePlayerStore()

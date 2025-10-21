@@ -1,5 +1,5 @@
 <script setup>
-  import Banner from '../components/Banner.vue'
+import Banner from '../components/base/Banner.vue'
   import Recommendation from '../components/Recommendation.vue';
   import NewestSong from '../components/NewestSong.vue';
   import RecList from '../components/RecList.vue';

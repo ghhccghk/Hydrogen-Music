@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
-  import { dialogCancel, dialogConfirm } from '../utils/dialog'
-  import { useOtherStore } from '../store/otherStore';
+  import {dialogCancel, dialogConfirm} from '../../utils/dialog'
+  import {useOtherStore} from '../../store/otherStore';
   import { storeToRefs } from 'pinia';
 
   const otherStore =  useOtherStore()
@@ -50,7 +50,7 @@
         z-index: 1000;
         width: 0;
         height: 0;
-        background-image: url('../assets/img/halftone.png');
+      background-image: url('../../assets/img/halftone.png');
         background-size: 40%;
         background-repeat: repeat;
         background-color: rgb(14, 14, 14);

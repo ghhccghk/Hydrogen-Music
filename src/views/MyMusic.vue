@@ -1,9 +1,9 @@
 <script setup>
   import { useRouter } from 'vue-router'
-  import LibraryType from '../components/LibraryType.vue'
-  import LibraryList from '../components/LibraryList.vue'
+  import LibraryType from '../components/library/LibraryType.vue'
+  import LibraryList from '../components/library/LibraryList.vue'
   import DownloadList from '../components/DownloadList.vue'
-  import LocalMusicList from '../components/LocalMusicList.vue'
+  import LocalMusicList from '../components/local/LocalMusicList.vue'
   import { useUserStore } from '../store/userStore'
   import { usePlayerStore } from '../store/playerStore'
   import { useLibraryStore } from '../store/libraryStore'

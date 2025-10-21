@@ -1,11 +1,11 @@
 <script setup>
   import { ref } from 'vue'
-  import { createPlaylist, updatePlaylist, deletePlaylist } from '../api/playlist'
-  import { addToNext, addToNextLocal } from '../utils/player'
-  import { noticeOpen } from '../utils/dialog';
-  import { useLibraryStore } from '../store/libraryStore';
-  import { useLocalStore } from '../store/localStore';
-  import { useOtherStore } from '../store/otherStore';
+  import {createPlaylist, updatePlaylist, deletePlaylist} from '../../api/playlist'
+  import {addToNext, addToNextLocal} from '../../utils/player'
+  import {noticeOpen} from '../../utils/dialog';
+  import {useLibraryStore} from '../../store/libraryStore';
+  import {useLocalStore} from '../../store/localStore';
+  import {useOtherStore} from '../../store/otherStore';
   import { storeToRefs } from 'pinia';
   const libraryStore = useLibraryStore()
   const localStore = useLocalStore()

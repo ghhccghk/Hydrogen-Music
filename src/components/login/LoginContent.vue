@@ -65,7 +65,7 @@
     <div class="login-container">
         <div class="login-header">
             <div class="login-icon">
-                <img src="../assets/img/netease-music.png" alt="">
+              <img alt="" src="../../assets/img/netease-music.png">
             </div>
             <span class="login-title">登录网易云账号</span>
         </div>

@@ -1,10 +1,10 @@
 <script setup>
   import { onActivated, ref } from 'vue'
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
-  import { useLibraryStore } from '../store/libraryStore'
-  import { usePlayerStore } from '../store/playerStore';
-  import { useLocalStore } from '../store/localStore';
-  import { useOtherStore } from '../store/otherStore';
+  import {useLibraryStore} from '../../store/libraryStore'
+  import {usePlayerStore} from '../../store/playerStore';
+  import {useLocalStore} from '../../store/localStore';
+  import {useOtherStore} from '../../store/otherStore';
   import { storeToRefs } from 'pinia'
   const libraryStore = useLibraryStore()
   const { libraryList, libraryInfo, listType1, listType2 } = storeToRefs(libraryStore)

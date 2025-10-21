@@ -1,7 +1,7 @@
 <script setup>
   import { ref,computed } from 'vue'
   import dayjs from 'dayjs'
-  import { useOtherStore } from '../store/otherStore'
+  import {useOtherStore} from '../../store/otherStore'
   const otherStore = useOtherStore()
 
   const props = defineProps(['mvlist'])

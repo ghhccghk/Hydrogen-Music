@@ -1,8 +1,8 @@
 <script setup>
   import { useRouter } from 'vue-router'
   import VueSlider from 'vue-slider-component'
-  import { songTime2, changeProgress } from '../utils/player';
-  import { usePlayerStore } from '../store/playerStore';
+  import {songTime2, changeProgress} from '../../utils/player';
+  import {usePlayerStore} from '../../store/playerStore';
   import { storeToRefs } from 'pinia';
   const router = useRouter()
   const playerStore = usePlayerStore()

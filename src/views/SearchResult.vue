@@ -3,9 +3,9 @@
   import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
   import { useOtherStore } from '@/store/otherStore';
   import { storeToRefs } from 'pinia';
-  import LibrarySongList from '../components/LibrarySongList.vue';
-  import LibraryAlbumList from '../components/LibraryAlbumList.vue';
-  import SearchResultList from '../components/SearchResultList.vue';
+  import LibrarySongList from '../components/library/LibrarySongList.vue';
+  import LibraryAlbumList from '../components/library/LibraryAlbumList.vue';
+  import SearchResultList from '../components/search/SearchResultList.vue';
   
   const otherStore = useOtherStore()
   const { getSearchInfo } = otherStore

@@ -31,7 +31,7 @@
 </template>
 <script setup>
 import { computed, onActivated, onDeactivated, ref } from "vue";
-import { absolutePosition } from "../utils/domHandler";
+import {absolutePosition} from "../../utils/domHandler";
 
 const props = defineProps({
   options: Array,

@@ -2,11 +2,11 @@
   import { ref, computed } from 'vue'
   import { useRouter, onBeforeRouteUpdate} from 'vue-router';
   import { nanoid } from 'nanoid'
-  import { songTime2 } from '../utils/player';
-  import { addLocalMusicTOList, setShuffledList } from '../utils/player'
-  import { useLocalStore } from '../store/localStore';
-  import { usePlayerStore } from '../store/playerStore';
-  import { useOtherStore } from '../store/otherStore';
+  import {songTime2} from '../../utils/player';
+  import {addLocalMusicTOList, setShuffledList} from '../../utils/player'
+  import {useLocalStore} from '../../store/localStore';
+  import {usePlayerStore} from '../../store/playerStore';
+  import {useOtherStore} from '../../store/otherStore';
   import { storeToRefs } from 'pinia';
   const router = useRouter()
   const localStore = useLocalStore()

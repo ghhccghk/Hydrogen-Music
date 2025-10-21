@@ -1,15 +1,15 @@
 <script setup>
   import Home from './views/Home.vue'
-  import Title from './components/Title.vue'
-  import SearchInput from './components/SearchInput.vue'
+  import Title from './components/base/Title.vue'
+  import SearchInput from './components/search/SearchInput.vue'
   import WindowControl from './components/WindowControl.vue'
   import MusicWidget from './components/MusicWidget.vue'
   import MusicPlayer from './views/MusicPlayer.vue'
   import VideoPlayer from './components/VideoPlayer.vue'
-  import ContextMenu from './components/ContextMenu.vue'
-  import GlobalDialog from './components/GlobalDialog.vue'
-  import GlobalNotice from './components/GlobalNotice.vue'
-  import Update from './components/Update.vue'
+  import ContextMenu from './components/base/ContextMenu.vue'
+  import GlobalDialog from './components/base/GlobalDialog.vue'
+  import GlobalNotice from './components/base/GlobalNotice.vue'
+  import Update from './components/base/Update.vue'
   import { initDesktopLyric } from './utils/desktopLyric';
   import { onMounted } from 'vue';
 

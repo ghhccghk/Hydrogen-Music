@@ -1,15 +1,15 @@
 <script setup>
   import { ref } from 'vue'
-  import router from '../router/router'
-  import { getUserPlaylistCount, getUserPlaylist } from '../api/user'
-  import { getUserSubAlbum } from '../api/album'
-  import { getUserSubArtists } from '../api/artist'
-  import { getUserSubMV } from '../api/mv'
-  import { useUserStore } from '../store/userStore'
-  import { useLibraryStore } from '../store/libraryStore'
-  import { useLocalStore } from '../store/localStore'
+  import router from '../../router/router'
+  import {getUserPlaylistCount, getUserPlaylist} from '../../api/user'
+  import {getUserSubAlbum} from '../../api/album'
+  import {getUserSubArtists} from '../../api/artist'
+  import {getUserSubMV} from '../../api/mv'
+  import {useUserStore} from '../../store/userStore'
+  import {useLibraryStore} from '../../store/libraryStore'
+  import {useLocalStore} from '../../store/localStore'
   import { storeToRefs } from 'pinia'
-  import { scanMusic } from '../utils/locaMusic.js'
+  import {scanMusic} from '../../utils/locaMusic.js'
 
   const userStore = useUserStore()
   const { user } = storeToRefs(userStore)

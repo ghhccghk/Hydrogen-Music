@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue'
-  import { useOtherStore } from '../store/otherStore';
+  import {useOtherStore} from '../../store/otherStore';
 
   const otherStore = useOtherStore()
   
@@ -24,7 +24,7 @@
     .notice-container{
         padding: 3Px 0;
         width: 0;
-        background-image: url('../assets/img/halftone.png');
+      background-image: url('../../assets/img/halftone.png');
         background-size: 40%;
         background-repeat: repeat;
         background-color: rgb(23, 23, 23);

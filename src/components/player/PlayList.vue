@@ -1,10 +1,10 @@
 <script setup>
 import {RecycleScroller} from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import {pauseMusic} from '../utils/player';
-import {addSong, setShuffledList} from '../utils/player'
+import {pauseMusic} from '../../utils/player';
+import {addSong, setShuffledList} from '../../utils/player'
 import {useRouter} from 'vue-router';
-import {usePlayerStore} from '../store/playerStore'
+import {usePlayerStore} from '../../store/playerStore'
 import {storeToRefs} from 'pinia'
 
 const router = useRouter()

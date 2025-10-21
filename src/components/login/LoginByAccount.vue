@@ -1,10 +1,10 @@
 <script setup>
   import { ref, onActivated } from 'vue'
-  import DataCheckAnimaton from './DataCheckAnimaton.vue';
+  import DataCheckAnimaton from '../base/DataCheckAnimaton.vue';
   import md5 from 'js-md5';
-  import { noticeOpen } from '../utils/dialog';
-  import { loginByEmail, loginByPhone} from '../api/login'
-  import { loginHandle } from '../utils/handle'
+  import {noticeOpen} from '../../utils/dialog';
+  import {loginByEmail, loginByPhone} from '../../api/login'
+  import {loginHandle} from '../../utils/handle'
 
   const props = defineProps(['currentMode'])
   const accountInput = ref()

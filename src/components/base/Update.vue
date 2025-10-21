@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue'
-  import { useOtherStore } from '../store/otherStore';
+  import {useOtherStore} from '../../store/otherStore';
   const otherStore = useOtherStore()
   const show = ref(true)
   const toUpdate = () => {
@@ -19,7 +19,7 @@
         <div class="update-container" :class="{'update-container-close': !show}">
             <div class="back-img"></div>
             <div class="logo">
-                <img src="../assets/icon/icon.ico" alt="">
+              <img alt="" src="../../assets/icon/icon.ico">
                 <div class="logo-title">
                     <div>Hydrogen</div>
                     <div>Music</div>
@@ -79,7 +79,7 @@
         .back-img{
             width: 70%;
             height: 200%;
-            background-image: linear-gradient(to right, rgb(0, 0, 0), rgba(0, 0, 0, 0)), url('../assets/img/halftone.png');
+          background-image: linear-gradient(to right, rgb(0, 0, 0), rgba(0, 0, 0, 0)), url('../../assets/img/halftone.png');
             transform: rotate(30deg);
             position: absolute;
             top: -60%;

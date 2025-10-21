@@ -1,19 +1,19 @@
 <script setup>
   import { ref, computed, onActivated } from 'vue'
   import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
-  import { isLogin } from '../utils/authority' 
-  import { noticeOpen } from '../utils/dialog';
-  import { subPlaylist } from '../api/playlist';
-  import { subAlbum } from '../api/album'
-  import { subArtist } from '../api/artist';
+  import {isLogin} from '../../utils/authority'
+  import {noticeOpen} from '../../utils/dialog';
+  import {subPlaylist} from '../../api/playlist';
+  import {subAlbum} from '../../api/album'
+  import {subArtist} from '../../api/artist';
   import dayjs from 'dayjs'
-  import { playAll } from '../utils/player';
+  import {playAll} from '../../utils/player';
   import LibrarySongList from './LibrarySongList.vue';
   import LibraryAlbumList from './LibraryAlbumList.vue';
-  import LibraryMVList from '../components/LibraryMVList.vue'
-  import { usePlayerStore } from '../store/playerStore';
-  import { useLibraryStore } from '../store/libraryStore'
-  import { useLocalStore } from '../store/localStore'
+  import LibraryMVList from './LibraryMVList.vue'
+  import {usePlayerStore} from '../../store/playerStore';
+  import {useLibraryStore} from '../../store/libraryStore'
+  import {useLocalStore} from '../../store/localStore'
   import { storeToRefs } from 'pinia'
 
   const playerStore = usePlayerStore()

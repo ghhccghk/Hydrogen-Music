@@ -1,8 +1,8 @@
 <script setup>
-  import Player from '../components/Player.vue'
-  import Lyric from '../components/Lyric.vue'
+import Player from '../components/player/Player.vue'
+import Lyric from '../components/lyric/Lyric.vue'
   import MusicVideo from '../components/MusicVideo.vue';
-  import PlayerVideo from '../components/PlayerVideo.vue';
+import PlayerVideo from '../components/player/PlayerVideo.vue';
   import { usePlayerStore } from '@/store/playerStore';
   const playerStore = usePlayerStore()
 </script>

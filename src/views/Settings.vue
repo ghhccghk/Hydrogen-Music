@@ -9,7 +9,7 @@ import { isLogin } from '@/utils/authority';
 import { useUserStore } from '@/store/userStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { insertCustomFontStyle } from '@/utils/setFont';
-import Selector from '../components/Selector.vue'
+import Selector from '../components/base/Selector.vue'
 import { setTheme, getSavedTheme } from '@/utils/theme';
 
 const router = useRouter()

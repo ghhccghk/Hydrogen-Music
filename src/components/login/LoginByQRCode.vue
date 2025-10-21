@@ -1,10 +1,10 @@
 <script setup>
   import { watch, ref } from 'vue'
-  import DataCheckAnimaton from './DataCheckAnimaton.vue'
+  import DataCheckAnimaton from '../base/DataCheckAnimaton.vue'
   import QRCode from 'qrcode'
-  import { getQRcode, checkQRcodeStatus } from '../api/login'
+  import {getQRcode, checkQRcodeStatus} from '../../api/login'
   import { onBeforeRouteLeave } from 'vue-router';
-  import { loginHandle } from '../utils/handle'
+  import {loginHandle} from '../../utils/handle'
 
   const props = defineProps(['firstLoadMode'])
   const firstLoadMode = ref(props.firstLoadMode)

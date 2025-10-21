@@ -4,7 +4,7 @@
   import { songTime2 } from '@/utils/player';
   import VueSlider from 'vue-slider-component'
   import '../assets/css/slider.css'
-  import PlayList from './PlayList.vue'
+  import PlayList from './player/PlayList.vue'
   import { toggleDesktopLyric } from '@/utils/desktopLyric';
 
   import { startMusic, pauseMusic, playLast, playNext, changeProgress, changePlayMode, likeSong } from '@/utils/player'

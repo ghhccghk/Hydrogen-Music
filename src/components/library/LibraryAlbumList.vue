@@ -2,7 +2,7 @@
   import { ref, computed } from 'vue'
   import dayjs from 'dayjs'
   import { useRouter } from 'vue-router'
-  import { usePlayerStore } from '../store/playerStore';
+  import {usePlayerStore} from '../../store/playerStore';
 
   const router = useRouter()
   const props = defineProps(['albumlist', 'type'])
