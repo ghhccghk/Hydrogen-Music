@@ -14,7 +14,7 @@
     <div class="login-mode">
       <div class="mode-type mode-netease" @click="modeSelect(0)">
         <div class="type-img">
-          <img src="../assets/img/netease-music.png" alt="">
+          <img alt="" src="../../assets/img/netease-music.png">
         </div>
         <div class="type-info">
           <span class="type-title">网易云音乐</span>

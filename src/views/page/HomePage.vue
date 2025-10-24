@@ -1,9 +1,9 @@
 <script setup>
-import Banner from '../components/base/Banner.vue'
-  import Recommendation from '../components/Recommendation.vue';
-  import NewestSong from '../components/NewestSong.vue';
-  import RecList from '../components/RecList.vue';
-  import { useUserStore } from '../store/userStore';
+import Banner from '../../components/base/Banner.vue'
+import Recommendation from '../../components/Recommendation.vue';
+import NewestSong from '../../components/NewestSong.vue';
+import RecList from '../../components/RecList.vue';
+import {useUserStore} from '../../store/userStore';
 
   const userStore = useUserStore()
   
