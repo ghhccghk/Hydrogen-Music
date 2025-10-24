@@ -1,10 +1,17 @@
 <script setup>
 import Player from '../components/player/Player.vue'
 import Lyric from '../components/lyric/Lyric.vue'
-  import MusicVideo from '../components/MusicVideo.vue';
+import MusicVideo from '../components/MusicVideo.vue';
 import PlayerVideo from '../components/player/PlayerVideo.vue';
-  import { usePlayerStore } from '@/store/playerStore';
-  const playerStore = usePlayerStore()
+import {usePlayerStore} from '@/store/playerStore';
+import ProgramIntro from '../components/radio/ProgramIntro.vue';
+import {computed} from 'vue';
+
+const playerStore = usePlayerStore()
+
+// 当播放电台节目时，右侧显示电台简介而非歌词
+const isDj = computed(() => playerStore.listInfo && playerStore.listInfo.type === 'dj');
+
 </script>
 
 <template>
@@ -13,7 +20,8 @@ import PlayerVideo from '../components/player/PlayerVideo.vue';
       <div class="back-drop" :style="{'backgroundImage': 'url(' + playerStore.coverUrl + ')'}" v-if="playerStore.coverBlur && !playerStore.videoIsPlaying"></div>
     </Transition>
     <Player class="player-container" :class="{'player-hide': playerStore.videoIsPlaying && !playerStore.playerShow, 'player-blur': playerStore.videoIsPlaying ,'cover-blur': playerStore.coverBlur}"></Player>
-    <Lyric class="lyric-container" :class="{'lyric-hide': playerStore.videoIsPlaying && !playerStore.playerShow}"></Lyric>
+    <ProgramIntro v-if="isDj" key="program-intro"/>
+    <Lyric v-else-if="!isDj" :key="`lyric-${lyricKey}`" class="lyric-container"></Lyric>
     <Transition name="fade">
       <MusicVideo class="music-video" v-if="playerStore.addMusicVideo"></MusicVideo>
     </Transition>

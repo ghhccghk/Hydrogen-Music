@@ -1,15 +1,16 @@
 <script setup>
   import { ref } from 'vue'
   import router from '../../router/router'
-  import {getUserPlaylistCount, getUserPlaylist} from '../../api/user'
-  import {getUserSubAlbum} from '../../api/album'
-  import {getUserSubArtists} from '../../api/artist'
-  import {getUserSubMV} from '../../api/mv'
-  import {useUserStore} from '../../store/userStore'
-  import {useLibraryStore} from '../../store/libraryStore'
-  import {useLocalStore} from '../../store/localStore'
+  import {getUserPlaylistCount, getUserPlaylist} from '@/api/user'
+  import {getUserSubAlbum} from '@/api/album'
+  import {getUserSubArtists} from '@/api/artist'
+  import {getUserSubMV} from '@/api/mv'
+  import {useUserStore} from '@/store/userStore'
+  import {useLibraryStore} from '@/store/libraryStore'
+  import {useLocalStore} from '@/store/localStore'
   import { storeToRefs } from 'pinia'
-  import {scanMusic} from '../../utils/locaMusic.js'
+  import {scanMusic} from '@/utils/locaMusic'
+  import {getDjSubList} from '@/api/dj'
 
   const userStore = useUserStore()
   const { user } = storeToRefs(userStore)
@@ -76,6 +77,13 @@
             libraryList.value = result.data
             listType2.value = 2
         })
+    } else if (option.value == 1 && typeTwo.value == 3) { // 电台
+      const params = {limit: 50, offset: 0}
+      getDjSubList(params).then(result => {
+        const list = result?.djRadios || result?.data || result?.radios || []
+        libraryList.value = list
+        listType2.value = 3
+      })
     } else if (option.value == 2 && typeThree.value == 0) {//正在下载
         listType2.value = 0
     } else if (option.value == 2 && typeThree.value == 1) {//下载完成
@@ -146,6 +154,8 @@
                 <span v-show="option == 0" class="option" :class="{'option-selected': typeOne == 1}" @click="changeType(1)">我收藏的</span>
                 <span v-show="option == 1" class="option" :class="{'option-selected': typeTwo == 0}" @click="changeType(0)">专辑</span>
                 <span v-show="option == 1" class="option" :class="{'option-selected': typeTwo == 1}" @click="changeType(1)">歌手</span>
+              <span v-show="option == 1" :class="{'option-selected': typeTwo == 3}" class="option"
+                    @click="changeType(3)">电台</span>
                 <span v-show="option == 1" class="option" :class="{'option-selected': typeTwo == 2}" @click="changeType(2)">MV</span>
                 <span v-show="option == 2" class="option" :class="{'option-selected': typeThree == 0}" @click="changeType(0)">正在下载</span>
                 <span v-show="option == 2" class="option" :class="{'option-selected': typeThree == 1}" @click="changeType(1)">下载完成</span>
