@@ -66,6 +66,50 @@ export function loginByPhone(params) {
 
 
 /**
+ * 使用Cookie登录
+ * 通过粘贴网页版网易云音乐的cookie来登录
+ * @param {String} cookie - 从网页版复制的cookie字符串
+ * @returns
+ */
+export function loginByCookie(cookie) {
+  return new Promise((resolve, reject) => {
+    try {
+      // 直接设置cookie到document.cookie
+      document.cookie = cookie;
+
+      // 解析cookie字符串，提取关键字段
+      const cookieObj = {};
+      cookie.split(';').forEach(item => {
+        const [key, value] = item.trim().split('=');
+        if (key && value) {
+          cookieObj[key] = value;
+        }
+      });
+
+      // 检查是否包含必要的登录cookie
+      if (cookieObj.MUSIC_U) {
+        // 模拟成功响应格式
+        resolve({
+          code: 200,
+          cookie: cookie,
+          message: 'Cookie登录成功'
+        });
+      } else {
+        reject({
+          code: 400,
+          message: 'Cookie中缺少必要的登录信息(MUSIC_U)'
+        });
+      }
+    } catch (error) {
+      reject({
+        code: 500,
+        message: 'Cookie格式错误或登录失败'
+      });
+    }
+  });
+}
+
+/**
  * 调用此接口 , 可退出登录
  * @returns 
  */

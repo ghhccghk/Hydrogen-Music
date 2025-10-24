@@ -605,6 +605,7 @@ const setCustomFont = () => {
       font-family: SourceHanSansCN-Bold;
       color: black;
       text-align: left;
+      margin-bottom: 15px; /* 保证设置文字不会距离用户信息卡片太近*/
     }
     .settings-user-info {
       padding: 10px 40px;
