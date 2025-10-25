@@ -1,3 +1,34 @@
+<script setup>
+
+import {ref, watch} from 'vue'
+
+defineProps({
+  show: Boolean,
+  description: {
+    type: String,
+    default: '暂无描述'
+  }
+})
+defineEmits(['close'])
+
+const showDelay = ref(false)
+const contentVisible = ref(false)
+
+function onAfterEnter() {
+  showDelay.value = true
+  contentVisible.value = true
+}
+
+function onAfterLeave() {
+  showDelay.value = false
+  contentVisible.value = false
+}
+
+watch(() => show, val => {
+  if (val) contentVisible.value = false
+})
+</script>
+
 <template>
   <transition name="metro" @after-enter="onAfterEnter" @after-leave="onAfterLeave">
     <div
@@ -7,12 +38,7 @@
       @click.self="$emit('close')"
     >
       <!-- 内容容器 -->
-      <div class="detail-text">
-        <!-- 默认内容：优先插槽 -->
-        <slot>
-          <p class="text">{{ description }}</p>
-        </slot>
-      </div>
+      <slot v-if="contentVisible" class="detail-text"></slot>
 
       <!-- 关闭按钮 -->
       <div class="text-close" @click="$emit('close')">
@@ -40,29 +66,6 @@
   </transition>
 </template>
 
-<script setup>
-import {ref} from 'vue'
-
-defineProps({
-  show: Boolean,
-  description: {
-    type: String,
-    default: '暂无描述'
-  }
-})
-defineEmits(['close'])
-
-const showDelay = ref(false)
-
-function onAfterEnter() {
-  showDelay.value = true
-}
-
-function onAfterLeave() {
-  showDelay.value = false
-}
-</script>
-
 <style lang="scss" scoped>
 .introduce-detail-text {
   width: 0;
@@ -75,26 +78,20 @@ function onAfterLeave() {
   transform: translate(-50%, -50%);
 
   &-active {
-    width: 80vw; // 宽度占屏幕 80%
-    max-width: 1900px; // 最大宽度
-    height: 60vh; // 高度占屏幕 60%
-    max-height: 1600px; // 最大高度
+    width: 80vw;
+    max-width: 1200px;
+    height: 60vh;
+    max-height: 80vh;
     padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .detail-text {
     width: 100%;
-    height: 100%;
-    overflow: auto;
-
-    .text {
-      margin: 0;
-      font: 14px "Source Han Sans";
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.9);
-      text-align: left;
-      text-indent: 2em;
-    }
+    flex: 1;
+    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
   .text-close {

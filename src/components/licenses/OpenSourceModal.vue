@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <MetroDialog :show="props.show" @close="handleClose">
+  <MetroDialog :show="props.show" style="max-height: 80vh;" @close="handleClose">
     <template v-if="loading">
       <div class="loading">
         <div class="spinner"></div>
@@ -39,7 +39,7 @@ onMounted(async () => {
     </template>
 
     <template v-else>
-      <p class="text">开源许可</p>
+      <p class="text" style="padding-bottom: 5px">开源许可</p>
       <div class="licenses">
         <div
           v-for="(info, name) in licenses"
@@ -52,9 +52,6 @@ onMounted(async () => {
             <a href="#" @click.prevent="openUri(info.repository)">仓库</a>
           </div>
         </div>
-      </div>
-      <div class="footer">
-        <button class="close-btn" @click="handleClose">关闭</button>
       </div>
     </template>
   </MetroDialog>
@@ -116,10 +113,6 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
-.footer {
-  margin-top: 12px;
-  text-align: center;
-}
 
 /* 滚动条整体 */
 .licenses::-webkit-scrollbar {
