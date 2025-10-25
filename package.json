@@ -46,6 +46,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "electron": "^38.2.1",
     "electron-builder": "^26.0.12",
+    "license-checker": "^25.0.1",
     "nodemon": "^3.1.10",
     "rollup": "^4.52.4",
     "sass": "^1.56.1",
