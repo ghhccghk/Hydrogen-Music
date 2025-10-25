@@ -11,6 +11,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import { insertCustomFontStyle } from '@/utils/setFont';
 import Selector from '../components/base/Selector.vue'
 import { setTheme, getSavedTheme } from '@/utils/theme';
+import OpenSourceModal from '@/components/licenses/OpenSourceModal.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -70,6 +71,7 @@ const themeOptions = ref([
   { label: '浅色', value: 'light' },
   { label: '深色', value: 'dark' },
 ]);
+const showOpenSource = ref(false)
 
 if (isLogin()) {
   getVipInfo().then(result => {
@@ -541,9 +543,11 @@ const setCustomFont = () => {
         <div class="version">V0.5.0</div>
         <div class="app-author" @click='noticeOpen("原作者Github账户已经消失", 2)'>Made by Kaidesuyo</div>
         <div class="app-author" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
+        <div class="app-author" @click='showOpenSource = true'>开源库信息</div>
       </div>
     </div>
   </div>
+  <OpenSourceModal v-model:show="showOpenSource"/>
 </template>
 
 <style scoped lang="scss">

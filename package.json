@@ -10,10 +10,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "license-checker --json > ./public/licenses.json && vite build ",
     "preview": "vite preview",
     "start": "nodemon --exec electron . --watch ./ --ext .html",
-    "dist": "vite build && electron-builder -p always"
+    "dist": "license-checker --json > ./public/licenses.json && vite build &&  electron-builder -p always"
   },
   "dependencies": {
     "@neteasecloudmusicapienhanced/api": "^4.29.9",
