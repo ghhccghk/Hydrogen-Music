@@ -79,9 +79,7 @@ watch(() => show, val => {
 
   &-active {
     width: 80vw;
-    max-width: 1200px;
     height: 60vh;
-    max-height: 80vh;
     padding: 2rem 3rem;
     display: flex;
     flex-direction: column;
@@ -169,7 +167,7 @@ watch(() => show, val => {
 }
 
 .metro-leave-active {
-  animation: introduce-detail-in 0.6s 0.1s reverse;
+  animation: introduce-detail-out 0.5s forwards;
 }
 
 @keyframes introduce-detail-in {
@@ -185,8 +183,28 @@ watch(() => show, val => {
   }
   100% {
     width: 80vw;
+    height: 60vh; /* 与 introduce-detail-text-active 保持一致 */
+    max-height: 80vh;
+    padding: 2rem 3rem; /* 与最终状态一致 */
+  }
+}
+
+@keyframes introduce-detail-out {
+  0% {
+    width: 80vw;
     height: 60vh;
     padding: 2rem 3rem;
   }
+  50% {
+    width: 80vw;
+    height: 0;
+    padding: 0 3rem;
+  }
+  100% {
+    width: 0;
+    height: 0;
+    padding: 0;
+  }
 }
+
 </style>
