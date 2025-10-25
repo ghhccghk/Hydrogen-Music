@@ -67,19 +67,17 @@ const subCount = computed(() => detail.value?.subCount || 0)
 
 <style lang="scss" scoped>
 .radio-intro {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   position: relative;
   display: flex;
   flex-direction: column;
   background: transparent;
-
   .intro-header {
     display: flex;
     align-items: center;
     gap: 14px;
     margin-bottom: 12px;
-
     .cover {
       width: 80px;
       height: 80px;
@@ -94,7 +92,6 @@ const subCount = computed(() => detail.value?.subCount || 0)
         display: block;
       }
     }
-
     .meta {
       display: flex;
       flex-direction: column;

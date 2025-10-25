@@ -20,8 +20,9 @@ const isDj = computed(() => playerStore.listInfo && playerStore.listInfo.type ==
       <div class="back-drop" :style="{'backgroundImage': 'url(' + playerStore.coverUrl + ')'}" v-if="playerStore.coverBlur && !playerStore.videoIsPlaying"></div>
     </Transition>
     <Player class="player-container" :class="{'player-hide': playerStore.videoIsPlaying && !playerStore.playerShow, 'player-blur': playerStore.videoIsPlaying ,'cover-blur': playerStore.coverBlur}"></Player>
-    <ProgramIntro v-if="isDj" key="program-intro"/>
-    <Lyric v-else-if="!isDj" :key="`lyric-${lyricKey}`" class="lyric-container"></Lyric>
+    <ProgramIntro v-if="isDj"/>
+    <Lyric v-else-if="!isDj" :key="`lyric-${lyricKey}`"
+           :class="{'lyric-hide': playerStore.videoIsPlaying && !playerStore.playerShow}"></Lyric>
     <Transition name="fade">
       <MusicVideo class="music-video" v-if="playerStore.addMusicVideo"></MusicVideo>
     </Transition>

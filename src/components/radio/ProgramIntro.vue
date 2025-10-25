@@ -38,6 +38,9 @@ const desc = computed(() => current.value.programDesc || '暂无节目简介')
   display: flex;
   flex-direction: column;
   background: transparent;
+  margin-left: 55px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
   .intro-header {
     display: flex;
@@ -100,23 +103,23 @@ const desc = computed(() => current.value.programDesc || '暂无节目简介')
   }
 
   .b1 {
-    top: 6Px;
-    left: 6Px;
+    top: -15px;
+    left: -15px;
   }
 
   .b2 {
-    top: 6Px;
-    right: 6Px;
+    top: -15px;
+    right: -15px;
   }
 
   .b3 {
-    bottom: 6Px;
-    right: 6Px;
+    bottom: -15px;
+    right: -15px;
   }
 
   .b4 {
-    bottom: 6Px;
-    left: 6Px;
+    bottom: -15px;
+    left: -15px;
   }
 }
 </style>
