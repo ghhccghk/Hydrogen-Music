@@ -718,6 +718,14 @@ const toggleDjSub = async (isSubscribe) => {
           ></path>
         </svg>
 
+        <!-- 播放列表 -->
+        <svg class="icon" height="200" p-id="15157" t="1668787624519"
+             version="1.1" viewBox="0 0 1024 1024" width="200" xmlns="http://www.w3.org/2000/svg" @click="playlistWidgetShow = !playlistWidgetShow">
+          <path
+            d="M85.333333 768h426.666667v85.333333H85.333333v-85.333333z m0-298.666667h597.333334v85.333334H85.333333v-85.333334z m0-298.666666h853.333334v85.333333H85.333333V170.666667z m725.333334 476.586666V384h213.333333v85.333333h-128v298.666667a128 128 0 1 1-85.333333-120.746667zM768 810.666667a42.666667 42.666667 0 1 0 0-85.333334 42.666667 42.666667 0 0 0 0 85.333334z"
+            p-id="15158"></path>
+        </svg>
+
         <!-- 桌面歌词控制按钮 -->
         <svg
           @click="toggleDesktopLyric"
