@@ -2568,9 +2568,10 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/humanize-ms",
     "licenseFile": "/home/ghhc/qt/Hydrogen-Music/node_modules/humanize-ms/LICENSE"
   },
-  "hydrogenmusic@0.5.0": {
+  "hydrogenmusic@0.5.1": {
     "licenses": "UNLICENSED",
     "private": true,
+    "repository": "https://github.com/ghhccghk/Hydrogen-Music",
     "publisher": "ghhccghk",
     "email": "2137610394@qq.com",
     "path": "/home/ghhc/qt/Hydrogen-Music",

@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import {version} from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   base: './',
   manifest: true,
+  define: {
+    __APP_VERSION__: JSON.stringify(version)
+  },
   build: {
     target: 'es2018', // 更新到ES2018以支持async generator functions
     rollupOptions: {

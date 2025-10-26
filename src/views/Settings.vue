@@ -72,6 +72,7 @@ const themeOptions = ref([
   { label: '深色', value: 'dark' },
 ]);
 const showOpenSource = ref(false)
+const version = __APP_VERSION__
 
 if (isLogin()) {
   getVipInfo().then(result => {
@@ -576,9 +577,13 @@ const clearFmRecent = () => {
         <div class="app-icon">
           <img alt="" src="../assets/icon/icon.ico">
         </div>
-        <div class="version">V0.5.0</div>
+        <div class="version">V{{ version }}</div>
         <div class="app-author" @click='noticeOpen("原作者Github账户已经消失", 2)'>Made by Kaidesuyo</div>
-        <div class="app-author" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
+        <div class="app-author-container">
+          <div class="app-author" @click='toGithub("ghhccghk/Hydrogen-Music")'>Fix by 李太白</div>
+          <div class="app-author">and</div>
+          <div class="app-author" @click='toGithub("ldx123000")'>ldx123000</div>
+        </div>
         <div class="app-author" @click='showOpenSource = true'>开源库信息</div>
       </div>
     </div>
@@ -1005,6 +1010,13 @@ const clearFmRecent = () => {
             box-shadow: 0 0 0 1px black;
           }
         }
+      }
+
+      .app-author-container {
+        display: flex;
+        justify-content: center; // 居中，可改为space-between或flex-start
+        align-items: center;
+        gap: 5px; // 两个元素间距
       }
       .app-author {
         margin-top: 10px;
