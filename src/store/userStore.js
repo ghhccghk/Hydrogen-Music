@@ -10,6 +10,7 @@ export const useUserStore = defineStore('userStore', {
             biliUser: null,
             homePage: true,
             cloudDiskPage: true,
+          personalFMPage: true,
         }
     },
     actions: {

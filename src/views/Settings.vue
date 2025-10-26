@@ -304,6 +304,23 @@ const toGithub = (text) => {
 const setCustomFont = () => {
   insertCustomFontStyle(customFont.value)
 }
+
+// 清空当前账号的“私人漫游”近期去重队列
+const getFmRecentKey = () => {
+  const uid = userStore?.user?.userId || 'guest';
+  return `hm.fm.recentPlayedQueue:${uid}`;
+};
+const clearFmRecent = () => {
+  try {
+    localStorage.removeItem(getFmRecentKey());
+    // 通知个人FM组件刷新其内存中的近期队列
+    window.dispatchEvent(new CustomEvent('fmClearRecent', {detail: {userId: userStore?.user?.userId || 'guest'}}));
+    noticeOpen('已清空当前账号的私人漫游缓存', 2);
+  } catch (e) {
+    console.error('清空私人漫游缓存失败:', e);
+    noticeOpen('清空失败', 2);
+  }
+};
 </script>
 
 <template>
@@ -517,6 +534,25 @@ const setCustomFont = () => {
                     <div v-show="userStore.cloudDiskPage" class="toggle-on"></div>
                   </Transition>
                 </div>
+              </div>
+            </div>
+            <div class="option">
+              <div class="option-name">开启私人漫游页面</div>
+              <div class="option-operation">
+                <div class="toggle" @click="userStore.personalFMPage = !userStore.personalFMPage">
+                  <div :class="{ 'toggle-on-in': userStore.personalFMPage }" class="toggle-off">
+                    {{ userStore.personalFMPage ? '已开启' : '已关闭' }}
+                  </div>
+                  <Transition name="toggle">
+                    <div v-show="userStore.personalFMPage" class="toggle-on"></div>
+                  </Transition>
+                </div>
+              </div>
+            </div>
+            <div v-if="userStore.personalFMPage" class="option">
+              <div class="option-name">清空漫游缓存</div>
+              <div class="option-operation">
+                <div class="button" @click="clearFmRecent">清空</div>
               </div>
             </div>
             <div class="option">

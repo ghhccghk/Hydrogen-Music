@@ -13,6 +13,8 @@ import SearchResult from '../views/SearchResult.vue'
 import Settings from '../views/Settings.vue'
 import RadioDetail from '../components/radio/RadioDetail.vue'
 
+const PersonalFMPage = () => import('../views/page/PersonalFMPage.vue')
+
 import {useUserStore} from '../store/userStore'
 import {useLibraryStore} from '../store/libraryStore'
 import {useLocalStore} from '../store/localStore'
@@ -168,6 +170,19 @@ const routes = [
     component: Settings,
     beforeEnter: (to, from, next) => {
       next()
+    }
+  },
+  {
+    path: '/personalfm',
+    name: 'personalfm',
+    component: PersonalFMPage,
+    beforeEnter: (to, from, next) => {
+      if (isLogin()) {
+        next()
+      } else {
+        noticeOpen("请先登录", 2)
+        next({name: 'login'})
+      }
     }
   },
 ]

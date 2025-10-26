@@ -1,44 +1,145 @@
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { logout } from '../api/user'
-  import { noticeOpen } from "../utils/dialog";
-  import { isLogin } from '../utils/authority'
-  import { useUserStore } from '../store/userStore';
+import {ref, onMounted, onBeforeUnmount, nextTick, watch} from 'vue';
+import {useRouter} from 'vue-router';
+import {logout} from '@/api/user'
+import {noticeOpen} from "@/utils/dialog";
+import {isLogin} from '@/utils/authority'
+import {useUserStore} from '@/store/userStore';
 
-  const router  =useRouter()
-  const userStore = useUserStore()
-  const isActive = ref(false)
-  const toSettings = () => {
-      router.push('/settings')
-  }
-  const userLogout = () => {
-    if(isLogin()){
-      logout().then(result => {
-        if(result.code == 200) {
-            window.localStorage.clear()
-            userStore.user = null
-            userStore.biliUser = null
-            router.push('/')
-            noticeOpen("已退出账号", 2)
+const router = useRouter()
+const userStore = useUserStore()
+const isActive = ref(false)
+const routerContainer = ref(null)
+const homeLink = ref(null)
+const cloudLink = ref(null)
+const fmLink = ref(null)
+const musicLink = ref(null)
+const trackerLeft = ref(0)
+const trackerVisible = ref(false)
+const toSettings = () => {
+  router.push('/settings')
+}
+const userLogout = () => {
+  if (isLogin()) {
+    logout().then(result => {
+      if (result.code == 200) {
+        window.localStorage.clear()
+        userStore.user = null
+        userStore.biliUser = null
+
+        // 清除Electron中的登录状态，确保下次登录需要重新扫码
+        if (window.electronAPI?.clearNeteaseSession) {
+          window.electronAPI.clearNeteaseSession()
         }
-        else noticeOpen("退出登录失败", 2)
-      })
-    } else noticeOpen("您已退出账号", 2)
+
+        router.push('/')
+        noticeOpen("已退出账号", 2)
+      } else noticeOpen("退出登录失败", 2)
+    })
+  } else noticeOpen("您已退出账号", 2)
+}
+const onAfterEnter = () => isActive.value = true
+const onAfterLeave = () => isActive.value = false
+
+const toDom = (maybeComp) => {
+  if (!maybeComp) return null
+  return maybeComp.$el ? maybeComp.$el : maybeComp
+}
+
+const resolveActiveEl = () => {
+  const name = router.currentRoute.value.name
+  // Determine active link element by current route
+  if (name === 'homepage' && userStore.homePage && homeLink.value) return toDom(homeLink.value)
+  if (name === 'clouddisk' && userStore.cloudDiskPage && cloudLink.value) return toDom(cloudLink.value)
+  if (name === 'personalfm' && userStore.personalFMPage && fmLink.value) return toDom(fmLink.value)
+  // My music or login pages map to My Music tab
+  const firstSeg = router.currentRoute.value.fullPath.split('/')[1]
+  if ((name === 'mymusic' || firstSeg === 'mymusic' || firstSeg === 'login') && musicLink.value) return toDom(musicLink.value)
+  // Fallback to first visible tab
+  const firstRef = toDom(homeLink.value) || toDom(cloudLink.value) || toDom(fmLink.value) || toDom(musicLink.value)
+  if (firstRef) return firstRef
+  // As last resort, find first anchor inside header-router
+  const anchors = routerContainer.value?.querySelectorAll('a')
+  return anchors && anchors[0] ? anchors[0] : null
+}
+
+const computeTrackerLeft = () => {
+  try {
+    const el = resolveActiveEl()
+    const container = routerContainer.value
+    if (!el || !container) {
+      trackerVisible.value = false;
+      return
+    }
+    const trackWidth = 14
+    // 优先使用 offset 以获得更稳定的定位（避免子像素与变换影响）
+    let left
+    if (el.offsetParent === container || el.offsetParent === container.offsetParent) {
+      left = el.offsetLeft + (el.offsetWidth - trackWidth) / 2
+    } else {
+      // 回退：使用 rect 差值
+      const elRect = el.getBoundingClientRect()
+      const cRect = container.getBoundingClientRect()
+      left = (elRect.left - cRect.left) + (elRect.width - trackWidth) / 2
+    }
+    trackerLeft.value = Math.max(0, Math.round(left))
+    trackerVisible.value = true
+  } catch (_) {
+    trackerVisible.value = false
   }
-  const onAfterEnter = () => isActive.value = true
-  const onAfterLeave = () => isActive.value = false
+}
+
+const updateTracker = () => {
+  nextTick(() => {
+    computeTrackerLeft()
+    // 在下一帧再次校准，避免字体加载/过渡导致的轻微偏移
+    requestAnimationFrame(() => computeTrackerLeft())
+  })
+}
+
+onMounted(() => {
+  updateTracker()
+  window.addEventListener('resize', updateTracker)
+  // 字体加载完成后再次校准，避免字体替换引起的偏移
+  try {
+    document.fonts?.ready?.then(() => updateTracker())
+  } catch (_) {
+  }
+  // 轻微延迟再对齐一遍，覆盖过渡后的微小偏移
+  setTimeout(() => updateTracker(), 120)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateTracker)
+})
+
+watch(() => router.currentRoute.value.fullPath, () => updateTracker())
+watch(() => [userStore.homePage, userStore.cloudDiskPage, userStore.personalFMPage], () => updateTracker(), {deep: true})
 </script>
 
 <template>
   <div>
     <main>
       <div class="home-header">
-        <div class="header-router" :class="{'router-closed': !userStore.homePage && !userStore.cloudDiskPage}">
+        <div ref="routerContainer" :class="{'router-closed': !userStore.homePage && !userStore.cloudDiskPage}"
+             class="header-router">
           <!-- <div class="logout" @click="userLogout()">退出登录</div> -->
-          <router-link class="button-home" :style="{color: router.currentRoute.value.name == 'homepage' ? 'black' : '#353535'}" to="/" v-if="userStore.homePage">首页</router-link>
-          <router-link class="button-cloud" :style="{color: router.currentRoute.value.name == 'clouddisk' ? 'black' : '#353535'}" to="/cloud" v-if="userStore.cloudDiskPage">云盘</router-link>
-          <router-link class="button-music" :style="{color: router.currentRoute.value.name == 'mymusic' ? 'black' : '#353535'}" to="/mymusic" v-if="userStore.homePage || userStore.cloudDiskPage">我的音乐</router-link>
+          <router-link v-if="userStore.homePage" ref="homeLink"
+                       :style="{color: router.currentRoute.value.name == 'homepage' ? 'black' : '#353535'}" class="button-home"
+                       to="/">首页
+          </router-link>
+          <router-link v-if="userStore.cloudDiskPage" ref="cloudLink"
+                       :style="{color: router.currentRoute.value.name == 'clouddisk' ? 'black' : '#353535'}" class="button-cloud"
+                       to="/cloud">云盘
+          </router-link>
+          <router-link v-if="userStore.personalFMPage" ref="fmLink"
+                       :style="{color: router.currentRoute.value.name == 'personalfm' ? 'black' : '#353535'}"
+                       class="button-fm" to="/personalfm">私人漫游
+          </router-link>
+          <router-link ref="musicLink" :style="{color: (router.currentRoute.value.name === 'mymusic' || router.currentRoute.value.fullPath.startsWith('/mymusic')) ? 'black' : '#353535'}"
+                       class="button-music"
+                       to="/mymusic">我的音乐
+          </router-link>
           <div class="user">
             <div class="user-container">
               <div class="user-head" @click="userStore.appOptionShow = true">
@@ -50,7 +151,7 @@
                 <div class="app-option" :class="{ 'app-option-active': isActive }" v-show="userStore.appOptionShow">
                   <div class="option" @click="toSettings()">设置</div>
                   <div class="option" @click="userLogout()">退出登录</div>
-  
+
                   <div class="option-style option-style1"></div>
                   <div class="option-style option-style2"></div>
                   <div class="option-style option-style3"></div>
@@ -59,11 +160,14 @@
               </transition>
             </div>
           </div>
-          <div v-if="userStore.homePage && userStore.cloudDiskPage" v-show="router.currentRoute.value.name != 'search' && router.currentRoute.value.name != 'settings'" :class="{'router-tracker': true, 'router-tracker0': router.currentRoute.value.name == 'homepage', 'router-tracker1': router.currentRoute.value.name == 'clouddisk', 'router-tracker2': router.currentRoute.value.fullPath.split('/')[1] == 'mymusic' || router.currentRoute.value.fullPath.split('/')[1] == 'login'}">
+          <div v-if="userStore.homePage || userStore.cloudDiskPage || userStore.personalFMPage || isLogin()"
+               v-show="router.currentRoute.value.name != 'search' && router.currentRoute.value.name != 'settings' && trackerVisible"
+               :style="{ left: trackerLeft + 'px' }"
+               class="router-tracker">
           </div>
         </div>
       </div>
-      
+
       <div class="home-content">
         <router-view  v-slot="{ Component }">
           <keep-alive>
@@ -76,162 +180,189 @@
 </template>
 
 <style scoped lang="scss">
-  main{
-    height: 100%;
-  }
-  
-  .home-header{
-    margin: 30px 0 20px 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    .header-router{
-      position: relative;
-      a{
-        font: 18px SourceHanSansCN-Bold;
-        color: black;
-        outline: none;
-      }
-      .button-home{
-        margin-right: 40px;
-      }
-      .button-cloud{
-        margin-right: 40px;
-      }
-      .router-tracker{
-        width: 14px;
-        height: 2px;
-        background-color: black;
-        position: absolute;
-        transition: 0.3s;
-      }
-      .router-tracker0{
-        transform: translateX(12px);
-      }
-      .router-tracker1{
-        transform: translateX(88px);
-      }
-      .router-tracker2{
-        transform: translateX(180px);
-      }
-      .user{
-        position: absolute;
-        top: 50%;
-        right: -35px;
-        transform: translateY(-50%);
-        z-index: 999;
-        .user-container{
-          width: 25px;
-          height: 25px;
+main {
+  height: 100%;
+}
+
+.home-header {
+  margin: 30px 0 20px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  .header-router {
+    position: relative;
+
+    a {
+      font: 18px SourceHanSansCN-Bold;
+      color: black;
+      outline: none;
+    }
+
+    .button-home {
+      margin-right: 30px;
+    }
+
+    .button-cloud {
+      margin-right: 30px;
+    }
+
+    .button-fm {
+      margin-right: 30px;
+    }
+
+    .router-tracker {
+      width: 14px;
+      height: 2px;
+      background-color: black;
+      position: absolute;
+      bottom: 0;
+      z-index: 2;
+      transition: left 0.3s ease;
+    }
+
+    /* removed fixed transforms; left is computed dynamically */
+    .user {
+      position: absolute;
+      top: 50%;
+      right: -35px;
+      transform: translateY(-50%);
+      z-index: 999;
+
+      .user-container {
+        width: 25px;
+        height: 25px;
+        position: relative;
+
+        .user-head {
+          width: 100%;
+          height: 100%;
+          border: 1px solid rgb(0, 0, 0, 0.6);
+          border-radius: 50%;
+          overflow: hidden;
           position: relative;
-          .user-head{
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          img, svg {
             width: 100%;
             height: 100%;
-            border: 1px solid rgb(0, 0, 0, 0.6);
-            border-radius: 50%;
-            overflow: hidden;
-            position: relative;
-            &:hover{
-              cursor: pointer;
-            }
-            img, svg{
-              width: 100%;
-              height: 100%;
-            }
-            svg{
-              margin-top: 2px;
-            }
-            .img-mask{
-              width: 100%;
-              height: 100%;
-              background-color: rgba(0, 0, 0, 0.3);
-              opacity: 0;
-              position: absolute;
-              top: 0;
-              left: 0;
-              transition: 0.15s;
-              &:hover{
-                opacity: 1;
-              }
+          }
+
+          svg {
+            margin-top: 2px;
+          }
+
+          .img-mask {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: 0.15s;
+
+            &:hover {
+              opacity: 1;
             }
           }
-          .app-option{
-            padding: 0;
-            width: 100px;
-            height: 0;
-            background-image: url('../assets/img/halftone.png');
-            background-size: 120%;
-            background-repeat: repeat;
-            background-color: rgb(20, 20, 20);
-            overflow: hidden;
+        }
+
+        .app-option {
+          padding: 0;
+          width: 100px;
+          height: 0;
+          background-image: url('../assets/img/halftone.png');
+          background-size: 120%;
+          background-repeat: repeat;
+          background-color: rgb(20, 20, 20);
+          overflow: hidden;
+          position: absolute;
+          top: 35px;
+          left: -32.5px;
+
+          &-active {
+            height: 96px;
+            padding: 12Px 0;
+          }
+
+          .option {
+            padding: 8px 14px;
+            font: 14Px SourceHanSansCN-Bold;
+            color: white;
+            text-align: left;
+            transition: 0.2s;
+
+            &:hover {
+              cursor: pointer;
+              background-color: rgba(53, 53, 53, 0.7);
+            }
+
+            &:active {
+              transform: scale(0.95);
+            }
+          }
+
+          .option-style {
+            width: 4px;
+            height: 4px;
+            background-color: white;
             position: absolute;
-            top: 35px;
-            left: -32.5px;
-            &-active {
-              height: 96px;padding: 12Px 0;
-            }
-            .option{
-              padding: 8px 14px;
-              font: 14Px SourceHanSansCN-Bold;
-              color: white;
-              text-align: left;
-              transition: 0.2s;
-              &:hover{
-                cursor: pointer;
-                background-color: rgba(53, 53, 53, 0.7);
-              }
-              &:active{
-                transform: scale(0.95);
-              }
-            }
-            .option-style{
-              width: 4px;
-              height: 4px;
-              background-color: white;
-              position: absolute;
-            }
-            $stylePosition: 4px;
-            .option-style1{
-              top: $stylePosition;
-              left: $stylePosition;
-            }
-            .option-style2{
-              top: $stylePosition;
-              right: $stylePosition;
-            }
-            .option-style3{
-              bottom: $stylePosition;
-              right: $stylePosition;
-            }
-            .option-style4{
-              bottom: $stylePosition;
-              left: $stylePosition;
-            }
+          }
+
+          $stylePosition: 4px;
+
+          .option-style1 {
+            top: $stylePosition;
+            left: $stylePosition;
+          }
+
+          .option-style2 {
+            top: $stylePosition;
+            right: $stylePosition;
+          }
+
+          .option-style3 {
+            bottom: $stylePosition;
+            right: $stylePosition;
+          }
+
+          .option-style4 {
+            bottom: $stylePosition;
+            left: $stylePosition;
           }
         }
       }
     }
-    .router-closed{
-      width: 100%;
-      height: 27px;
-      .user{
-        width: 30px;
-        position: absolute;
-        left: 365px;
-        transform: translateY(-55%);
-        z-index: 999;
-      }
+  }
+
+  .router-closed {
+    width: 100%;
+    height: 27px;
+
+    .user {
+      width: 30px;
+      position: absolute;
+      left: 365px;
+      transform: translateY(-55%);
+      z-index: 999;
     }
   }
-  .home-content{
-    padding: 0 45px;
-    height: calc(100% + 1px);
-    overflow: auto;
-    &::-webkit-scrollbar{
-      display: none;
-    }
+}
+
+.home-content {
+  padding: 0 45px;
+  height: calc(100% + 1px);
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
   }
+}
 </style>
 
 <style lang="scss">
