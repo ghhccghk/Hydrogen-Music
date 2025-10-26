@@ -4,7 +4,7 @@ import Lyric from '../components/lyric/Lyric.vue'
 import MusicVideo from '../components/MusicVideo.vue';
 import PlayerVideo from '../components/player/PlayerVideo.vue';
 import {usePlayerStore} from '@/store/playerStore';
-import ProgramIntro from '../components/radio/ProgramIntro.vue';
+import RadioProgramIntro from '../components/radio/RadioProgramIntro.vue';
 import {computed} from 'vue';
 
 const playerStore = usePlayerStore()
@@ -20,7 +20,7 @@ const isDj = computed(() => playerStore.listInfo && playerStore.listInfo.type ==
       <div class="back-drop" :style="{'backgroundImage': 'url(' + playerStore.coverUrl + ')'}" v-if="playerStore.coverBlur && !playerStore.videoIsPlaying"></div>
     </Transition>
     <Player class="player-container" :class="{'player-hide': playerStore.videoIsPlaying && !playerStore.playerShow, 'player-blur': playerStore.videoIsPlaying ,'cover-blur': playerStore.coverBlur}"></Player>
-    <ProgramIntro v-if="isDj"/>
+    <RadioProgramIntro v-if="isDj"/>
     <Lyric v-else-if="!isDj" :key="`lyric-${lyricKey}`"
            :class="{'lyric-hide': playerStore.videoIsPlaying && !playerStore.playerShow}"></Lyric>
     <Transition name="fade">
