@@ -1,87 +1,214 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
-  import dayjs from 'dayjs';
-  import VueSlider from 'vue-slider-component'
-  import { noticeOpen } from '../utils/dialog'
-  import { getCloudDiskData, uploadCloudSong } from '../api/cloud'
-  import CloudFileList from '../components/CloudFileList.vue'
-  import { useUserStore } from '../store/userStore'
-  import { useCloudStore } from '../store/cloudStore';
-  import { storeToRefs } from 'pinia';
-  const userStore = useUserStore()
-  const cloudStore = useCloudStore()
-  const { count, size, maxSize, cloudSongs } = storeToRefs(cloudStore)
+import {ref, onMounted, onUnmounted, computed} from 'vue'
+import {formatTime} from '@/utils/time';
+import VueSlider from 'vue-slider-component'
+import {noticeOpen} from '@/utils/dialog'
+import {getCloudDiskData, uploadCloudSong} from '@/api/cloud'
+import CloudFileList from '@/components/cloudFile/CloudFileList.vue'
+import {useUserStore} from '@/store/userStore'
+import {useCloudStore} from '@/store/cloudStore';
+import {storeToRefs} from 'pinia';
 
-  const isUploading = ref(false)
-  const uploadCloudDiskFile = ref()
-  const fileUpdateTime = {}
-  let fileLength = 0
+const userStore = useUserStore()
+const cloudStore = useCloudStore()
+const {count, size, maxSize, cloudSongs} = storeToRefs(cloudStore)
 
-  onMounted(() => {
+const isUploading = ref(false)
+const isDragOver = ref(false)
+const dragHasFiles = ref(false)
+const dragHasSupported = ref(false)
+const dragDetermined = ref(false)
+const uploadCloudDiskFile = ref()
+let changeHandler = null
+
+onMounted(() => {
+  typeChange(1)
+  changeHandler = async (e) => {
+    const input = uploadCloudDiskFile.value
+    if (!input) return
+    const files = Array.from(input.files || [])
+    if (!files.length) return
+    await uploadFilesSequentially(files)
+    // 清理 input 的值，释放文件引用并允许选择相同文件再次上传
+    try {
+      input.value = ''
+    } catch (_) {
+    }
+    // 上传完成后刷新云盘信息
     typeChange(1)
-    uploadCloudDiskFile.value.addEventListener('change', function (e) {
-      let currentIndx = 0
-      fileLength = this.files.length
-      for (const item of this.files) {
-        currentIndx += 1
-        upload(item, currentIndx)
-      }
-    })
-  })
+  }
+  uploadCloudDiskFile.value.addEventListener('change', changeHandler)
+})
 
-  const typeSelect = ref(1)
-
-  function typeChange(num) {
-    typeSelect.value = num
-    if(num == 1) {
-      let params = {
-        limit: 500,
-        offset: 0,
-        timestamp: new Date().getTime(),
-      }
-      getCloudDiskData(params).then(result => {
-        count.value = result.count
-        size.value = (result.size / 1024 / 1024 / 1024).toFixed(1)
-        maxSize.value = result.maxSize / 1024 / 1024 / 1024
-        cloudSongs.value = result.data
-      })
+onUnmounted(() => {
+  if (uploadCloudDiskFile.value && changeHandler) {
+    try {
+      uploadCloudDiskFile.value.removeEventListener('change', changeHandler)
+    } catch (_) {
     }
   }
-  const uploadFile = () => {
-    uploadCloudDiskFile.value.click()
-  }
-  function upload(file, currentIndx) {
-    var formData = new FormData()
-    formData.append('songFile', file)
-    isUploading.value = true
-    uploadCloudSong(formData).then(res => {
-      if(res.code == 200) {
-        noticeOpen(`${file.name} 上传成功`, 2)
-        if (currentIndx >= fileLength) { 
-          noticeOpen('上传完毕', 2)
-          formData = null
-          this.files = null
-        }
-      } else {
-        console.log(fileUpdateTime)
-        fileUpdateTime[file.name] ? fileUpdateTime[file.name] += 1 : fileUpdateTime[file.name] = 1
-        if (fileUpdateTime[file.name] >= 4) {
-          noticeOpen(`上传失败：${file.name}`, 3)
-          return
-        } else {
-          noticeOpen(`${file.name} 失败 ${fileUpdateTime[file.name]} 次`, 3)
-        }
-        upload(file, currentIndx)
-      }
-      
-      console.log(res)
-    }).finally(() => {
-      isUploading.value = false
+})
+
+const typeSelect = ref(1)
+
+function typeChange(num) {
+  typeSelect.value = num
+  if (num == 1) {
+    let params = {
+      limit: 500,
+      offset: 0,
+      timestamp: new Date().getTime(),
+    }
+    getCloudDiskData(params).then(result => {
+      count.value = result.count
+      // 确保为数字，避免字符串进入 v-model
+      size.value = Number((result.size / 1024 / 1024 / 1024).toFixed(1))
+      maxSize.value = Number(result.maxSize / 1024 / 1024 / 1024)
+      cloudSongs.value = result.data
     })
   }
-  const addTime =(time) => {
-    return dayjs(time).format("YYYY-MM-DD HH:mm:ss")
+}
+
+const uploadFile = () => {
+  uploadCloudDiskFile.value.click()
+}
+const supportedExt = new Set(['mp3', 'aac', 'wma', 'wav', 'ogg', 'm4a', 'ape', 'flac', 'cue'])
+const extractExt = (name) => (name?.split('.').pop() || '').toLowerCase()
+const analyzeDragItems = (dt) => {
+  const types = Array.from(dt?.types || [])
+  const isFiles = types.includes('Files')
+  dragHasFiles.value = isFiles
+  let hasKnownSupported = false
+  let hasKnownUnsupported = false
+  let sawUnknown = false
+  if (isFiles) {
+    const items = Array.from(dt?.items || [])
+    if (items.length) {
+      for (const it of items) {
+        if (it.kind !== 'file') continue
+        const mime = it.type || ''
+        if (mime) {
+          if (mime.startsWith('audio/')) {
+            hasKnownSupported = true;
+            continue
+          }
+          // 若提供了类型且非音频，视为已知不支持
+          hasKnownUnsupported = true
+          continue
+        }
+        try {
+          const f = it.getAsFile?.()
+          if (f && f.name) {
+            const ext = extractExt(f.name)
+            if (supportedExt.has(ext)) hasKnownSupported = true
+            else hasKnownUnsupported = true
+          } else {
+            sawUnknown = true
+          }
+        } catch (_) {
+          sawUnknown = true
+        }
+      }
+    } else {
+      // 无法获取 items 时保持未知，避免误判
+      sawUnknown = true
+    }
   }
+  if (hasKnownSupported) {
+    dragHasSupported.value = true
+    dragDetermined.value = true
+  } else if (hasKnownUnsupported && !sawUnknown) {
+    dragHasSupported.value = false
+    dragDetermined.value = true
+  } else {
+    dragHasSupported.value = true // 未知时偏向正向提示
+    dragDetermined.value = false
+  }
+}
+const handleDragEnter = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  analyzeDragItems(e.dataTransfer)
+  isDragOver.value = dragHasFiles.value && !isUploading.value
+}
+const handleDragOver = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  analyzeDragItems(e.dataTransfer)
+  isDragOver.value = dragHasFiles.value && !isUploading.value
+  try {
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
+  } catch (_) {
+  }
+}
+const handleDragLeave = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  isDragOver.value = false
+}
+const handleDrop = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  isDragOver.value = false
+  if (isUploading.value) {
+    noticeOpen('正在上传，请稍后再试', 2)
+    return
+  }
+  const list = Array.from(e.dataTransfer?.files || [])
+  const files = list.filter(f => supportedExt.has(extractExt(f.name)))
+  if (!files.length) {
+    noticeOpen('未检测到支持的音频文件', 2)
+    return
+  }
+  await uploadFilesSequentially(files)
+  // 上传完成后刷新云盘信息
+  typeChange(1)
+}
+const dropOverlayTitle = computed(() => (dragDetermined.value && !dragHasSupported.value) ? 'UNSUPPORTED' : 'DROP TO UPLOAD')
+const dropOverlaySub = computed(() => (dragDetermined.value && !dragHasSupported.value) ? '不支持的文件类型' : '释放文件开始上传')
+
+async function uploadSingle(file) {
+  const formData = new FormData()
+  formData.append('songFile', file)
+  const res = await uploadCloudSong(formData)
+  if (res && res.code === 200) return res
+  // axios拦截器会在错误时返回对象而非抛出异常，这里统一当做失败处理
+  throw new Error(res?.msg || res?.message || '上传失败')
+}
+
+async function uploadFilesSequentially(files) {
+  isUploading.value = true
+  try {
+    const maxRetries = 3
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      let attempt = 0
+      while (attempt < maxRetries) {
+        try {
+          await uploadSingle(file)
+          noticeOpen(`${file.name} 上传成功`, 2)
+          break
+        } catch (err) {
+          attempt += 1
+          if (attempt >= maxRetries) {
+            noticeOpen(`上传失败：${file.name}`, 3)
+          } else {
+            noticeOpen(`${file.name} 失败 ${attempt} 次，重试中...`, 3)
+            // 线性退避，避免请求风暴
+            await new Promise(r => setTimeout(r, 800 * attempt))
+          }
+        }
+      }
+    }
+    noticeOpen('上传完毕', 2)
+  } finally {
+    isUploading.value = false
+  }
+}
+
+const addTime = (time) => {
+  return formatTime(time, "YYYY-MM-DD HH:mm:ss")
+}
 </script>
 
 <template>
@@ -138,7 +265,7 @@
         </div>
         <div class="disk-info" v-if="cloudSongs">
           <div class="info-container">
-          <div class="info-title">云盘信息</div>
+            <div class="info-title">云盘信息</div>
             <div class="info-list">
               <div class="info-item">
                 <div class="item-lable">当前用户</div>
@@ -148,7 +275,9 @@
                 <div class="item-lable">云盘容量</div>
                 <div class="disk-capacity">
                   <div class="capacity">
-                    <vue-slider id="widget-progress" class="cloud-capacity"  v-model="size" :min="0" :max="maxSize" :interval="0.1" :duration="0.5" tooltip="none" :clickable="false"></vue-slider>
+                    <vue-slider id="widget-progress" v-model="size" :clickable="false" :disabled="true" :duration="0.5"
+                                :interval="0.1" :max="maxSize" :min="0" class="cloud-capacity"
+                                tooltip="none"></vue-slider>
                   </div>
                   <div class="capacity-num">{{ size }}G / {{ maxSize }}G</div>
                 </div>
@@ -172,7 +301,14 @@
         <svg class="tab-back1" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2927" width="200" height="200"><path d="M513.024 65.536q93.184 0 175.616 35.84t143.872 97.28 97.28 143.872 35.84 175.616q0 94.208-35.84 176.64t-97.28 143.872-143.872 97.28-175.616 35.84q-94.208 0-176.64-35.84t-143.872-97.28-97.28-143.872-35.84-176.64q0-93.184 35.84-175.616t97.28-143.872 143.872-97.28 176.64-35.84zM513.024 909.312q80.896 0 152.064-30.72t124.416-83.968 83.968-124.416 30.72-152.064-30.72-152.064-83.968-124.416-124.416-83.968-152.064-30.72q-81.92 0-153.088 30.72t-124.416 83.968-83.968 124.416-30.72 152.064 30.72 152.064 83.968 124.416 124.416 83.968 153.088 30.72zM513.024 190.464q66.56 0 124.928 25.088t102.4 69.12 69.12 102.4 25.088 124.928-25.088 125.44-69.12 102.912-102.4 69.12-124.928 25.088-125.44-25.088-102.912-69.12-69.12-102.912-25.088-125.44 25.088-124.928 69.12-102.4 102.912-69.12 125.44-25.088z" p-id="2928" fill="#ffffff"></path></svg>
         <div class="tab-back2">INFO</div>
       </div>
-      <div class="disk-upload">
+      <div
+        :class="{ dragover: isDragOver }"
+        class="disk-upload"
+        @dragenter="handleDragEnter"
+        @dragleave="handleDragLeave"
+        @dragover="handleDragOver"
+        @drop="handleDrop"
+      >
         <Transition name="upload-fade">
           <div class="upload" @click.stop="uploadFile()" v-show="!isUploading">
             <div class="upload-icon">
@@ -190,6 +326,13 @@
             <div class="animation"></div>
           </div>
         </Transition>
+        <!-- Drag-and-drop overlay -->
+        <div v-show="isDragOver" :class="{ unsupported: dragDetermined && !dragHasSupported }" class="drop-overlay">
+          <div class="overlay-inner">
+            <div class="overlay-title">{{ dropOverlayTitle }}</div>
+            <div class="overlay-sub">{{ dropOverlaySub }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -200,290 +343,456 @@
 </template>
 
 <style scoped lang="scss">
-  .cloud-disk{
-    width: 100%;
-    height: calc(100% - 110Px);
-    display: flex;
-    flex-direction: row;
-    .disk-left{
-      width: 55%;
-      max-width: 450Px;
-      height: 100%;
-      .disk-title{
-        margin-bottom: 5Px;
+.cloud-disk {
+  width: 100%;
+  height: calc(100% - 110Px);
+  display: flex;
+  flex-direction: row;
+
+  .disk-left {
+    width: 55%;
+    max-width: 450Px;
+    height: 100%;
+
+    .disk-title {
+      margin-bottom: 5Px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .title-tip {
+        margin-right: 5Px;
+        width: 6Px;
+        height: 6Px;
+        background-color: black;
+      }
+
+      .title-name {
+        font: 16Px SourceHanSansCN-Bold;
+        text-align: left;
+        color: black;
         display: flex;
         flex-direction: row;
-        align-items: center;
-        .title-tip{
-          margin-right: 5Px;
-          width: 6Px;
-          height: 6Px;
-          background-color: black;
-        }
-        .title-name{
-          font: 16Px SourceHanSansCN-Bold;
-          text-align: left;
-          color: black;
-          display: flex;
-          flex-direction: row;
-        }
       }
-      .disk-tab{
-        height: calc(78% - 29Px);
-        background-color: rgba(255, 255, 255, 0.30);
-        position: relative;
-        .file-type{
-          height: 55%;
-          padding: 22Px 12Px 10Px 10Px;
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          align-content: space-evenly;
-          .type{
-            transition: 0.2s;
-            &:hover{
-              cursor: pointer;
-            }
-            .type-icon{
-              display: flex;
-              justify-content: center;
-              position: relative;
-              .icon{
-                width: 35Px;
-                height: 35Px;
-              }
-              .type-select{
-                width: 60Px;
-                height: 45Px;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%,-50%);
-                opacity: 0;
-              }
-              .type-selected{
-                animation: type-selected 0.35s ease-out forwards;
-              }
-              @keyframes type-selected {
-                0%{width: 75Px;height: 60Px;}
-                40%{width: 65Px;height: 45Px;opacity: 0.8;}
-                60%{width: 65Px;height: 45Px;opacity: 0.8;}
-                100%{width: 55Px;height: 45Px;opacity: 0.8;}
-              }
-            }
-            .type-name{
-              margin-top: 10Px;
-              font: 12Px SourceHanSanSCN-Bold;
-              color: black;
-            }
+    }
+
+    .disk-tab {
+      height: calc(78% - 29Px);
+      background-color: rgba(255, 255, 255, 0.30);
+      position: relative;
+
+      .file-type {
+        height: 55%;
+        padding: 22Px 12Px 10Px 10Px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        align-content: space-evenly;
+
+        .type {
+          transition: 0.2s;
+
+          &:hover {
+            cursor: pointer;
           }
-        }
-        .disk-info{
-          padding: 10Px;
-          height: 45%;
-          .info-container{
-            width: 100%;
-            height: 100%;
-            padding: 5Px 7Px;
-            background-color: rgba(255, 255, 255, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            .info-title{
-              font: 9Px SourceHanSansCN-Bold;
-              text-align: left;
-              color: rgba(255, 255, 255, 0.9);
-              background-color: black;
-              padding: 1Px 4Px;
-            }
-            .info-list{
-              height: 100%;
-              padding: 0 4Px;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-evenly;
-              .info-item{
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                .item-lable{
-                  margin-right: 6Px;
-                  font: 12Px SourceHanSansCN-Bold;
-                  color: black;
-                  white-space: nowrap;
-                }
-                .item-info{
-                  font: 10Px SourceHanSansCN-Bold;
-                  color: black;
-                }
-                .disk-capacity{
-                  width: 100%;
-                  display: flex;
-                  align-items: center;
-                  .capacity{
-                    margin-right: 6Px;
-                    width: 100%;
-                    position: relative;
-                    .cloud-capacity{
-                      height: 7Px !important;
-                      box-shadow: 0 0 0 0.5Px black !important;
-                    }
-                  }
-                  .capacity-num{
-                    text-align: left;
-                    white-space: nowrap;
-                    font: 9Px SourceHanSansCN-Bold;
-                    color: black;
-                  }
-                }
-              }
-            }
-            .info-footer{
-              .footer-line{
-                height: 0.5Px;
-                background-color: black;
-              }
-              .footer-title{
-                font: 9Px Source Han Sans;
-                color: rgb(181, 181, 181);
-                text-align: right;
-              }
-            }
-          }
-        }
-        .tab-back1{
-          width: 16Px;
-          height: 16Px;
-          position: absolute;
-          top: 10Px;
-          left: 10Px;
-          opacity: 0.6;
-        }
-        .tab-back2{
-          font: 38Px SourceHanSansCN-Bold;
-          color: white;
-          position: absolute;
-          top: 0;
-          right: 10px;
-          opacity: 0.2;
-          pointer-events: none;
-        }
-      }
-      .disk-upload{
-        margin-top: 10Px;
-        width: 100%;
-        height: calc(22% - 10Px);
-        background-color: rgba(255, 255, 255, 0.30);
-        position: relative;
-        transition: 0.2s;
-        &:hover{
-          cursor: pointer;
-          background-color: rgba(255, 255, 255, 0.50);
-        }
-        &:active{
-          background-color: rgba(255, 255, 255, 0.30);
-        }
-        .upload{
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          position: absolute;
-          .upload-icon{
-            margin-right: 12Px;
-            width: 45Px;
-            height: 45Px;
-            position: relative;
+
+          .type-icon {
             display: flex;
             justify-content: center;
-            align-items: center;
-            .icon1{
-              width: 100%;
-              height: 100%;
-              opacity: 0.7;
-              position: absolute;
-              animation: upload-icon 12s linear infinite;
+            position: relative;
+
+            .icon {
+              width: 35Px;
+              height: 35Px;
             }
-            .icon2{
-              width: 70%;
-              height: 70%;
+
+            .type-select {
+              width: 60Px;
+              height: 45Px;
               position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              opacity: 0;
             }
-            @keyframes upload-icon {
-              0%{transform: rotate(0);}
-              100%{transform: rotate(360deg);}
+
+            .type-selected {
+              animation: type-selected 0.35s ease-out forwards;
+            }
+
+            @keyframes type-selected {
+              0% {
+                width: 75Px;
+                height: 60Px;
+              }
+              40% {
+                width: 65Px;
+                height: 45Px;
+                opacity: 0.8;
+              }
+              60% {
+                width: 65Px;
+                height: 45Px;
+                opacity: 0.8;
+              }
+              100% {
+                width: 55Px;
+                height: 45Px;
+                opacity: 0.8;
+              }
             }
           }
-          .upload-title{
-            font: 20Px Sours Han Sans;
-            color: rgb(130, 130, 130);
-            font-weight: lighter;
+
+          .type-name {
+            margin-top: 10Px;
+            font: 12Px SourceHanSanSCN-Bold;
+            color: black;
           }
         }
-        $uploadColor: rgb(255, 255, 255, 0.1);
-        .upload-animation{
+      }
+
+      .disk-info {
+        padding: 10Px;
+        height: 45%;
+
+        .info-container {
           width: 100%;
           height: 100%;
+          padding: 5Px 7Px;
+          background-color: rgba(255, 255, 255, 0.5);
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          position: absolute;
-          overflow: hidden;
-          pointer-events: none;
-          background: linear-gradient(135deg, #0000 25%, $uploadColor 0, $uploadColor 50%, #0000 0, #0000 75%, $uploadColor 0);
-          background-size: 15px 15px;
-          animation: upload-background 20s linear infinite;
-          @keyframes upload-background {
-            0%{background-position: 0%;}
-            100%{background-position: 100%;}
-          }
-          .uploading-title{
-            font: 20Px Sours Han Sans;
-            color: rgb(130, 130, 130);
-            font-weight: lighter;
-          }
-          .uploading-subtitle{
-            font: 12Px Sours Han Sans;
-            color: rgb(130, 130, 130);
-            font-weight: lighter;
-          }
-          .animation{
-            width: 10%;
-            height: 1Px;
+          justify-content: space-between;
+
+          .info-title {
+            font: 9Px SourceHanSansCN-Bold;
+            text-align: left;
+            color: rgba(255, 255, 255, 0.9);
             background-color: black;
-            position: absolute;
-            top: 0;
-            left: 10%;
-            animation: upload-animation 3s infinite;
-            transform: rotate(180deg);
-            @keyframes upload-animation {
-              0%{width: 0%;left: 120%;}
-              40%{width: 150%;left: 120%;}
-              65%{width: 0%;left: -30%;}
-              85%{width: 60%;}
-              100%{width: 0%;left: 120%;}
+            padding: 1Px 4Px;
+          }
+
+          .info-list {
+            height: 100%;
+            padding: 0 4Px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+
+            .info-item {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+
+              .item-lable {
+                margin-right: 6Px;
+                font: 12Px SourceHanSansCN-Bold;
+                color: black;
+                white-space: nowrap;
+              }
+
+              .item-info {
+                font: 10Px SourceHanSansCN-Bold;
+                color: black;
+              }
+
+              .disk-capacity {
+                width: 100%;
+                display: flex;
+                align-items: center;
+
+                .capacity {
+                  margin-right: 6Px;
+                  width: 100%;
+                  position: relative;
+
+                  .cloud-capacity {
+                    height: 7Px !important;
+                    box-shadow: 0 0 0 0.5Px black !important;
+                    pointer-events: none;
+                  }
+                }
+
+                .capacity-num {
+                  text-align: left;
+                  white-space: nowrap;
+                  font: 9Px SourceHanSansCN-Bold;
+                  color: black;
+                }
+              }
+            }
+          }
+
+          .info-footer {
+            .footer-line {
+              height: 0.5Px;
+              background-color: black;
+            }
+
+            .footer-title {
+              font: 9Px Source Han Sans;
+              color: rgb(181, 181, 181);
+              text-align: right;
             }
           }
         }
       }
+
+      .tab-back1 {
+        width: 16Px;
+        height: 16Px;
+        position: absolute;
+        top: 10Px;
+        left: 10Px;
+        opacity: 0.6;
+      }
+
+      .tab-back2 {
+        font: 38Px SourceHanSansCN-Bold;
+        color: white;
+        position: absolute;
+        top: 0;
+        right: 10px;
+        opacity: 0.2;
+        pointer-events: none;
+      }
     }
-    .disk-right{
-      margin-top: 29Px;
-      margin-left: 50Px;
+
+    .disk-upload {
+      margin-top: 10Px;
       width: 100%;
-      height: calc(100% - 29Px);
+      height: calc(22% - 10Px);
+      background-color: rgba(255, 255, 255, 0.30);
+      position: relative;
+      transition: 0.2s;
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.50);
+      }
+
+      &.dragover {
+        background-color: rgba(255, 255, 255, 0.55);
+        outline: 1Px dashed black;
+        outline-offset: -6Px;
+
+        .upload {
+          opacity: 0;
+        }
+      }
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.30);
+      }
+
+      .upload {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+
+        .upload-icon {
+          margin-right: 12Px;
+          width: 45Px;
+          height: 45Px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .icon1 {
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            position: absolute;
+            animation: upload-icon 12s linear infinite;
+          }
+
+          .icon2 {
+            width: 70%;
+            height: 70%;
+            position: absolute;
+          }
+
+          @keyframes upload-icon {
+            0% {
+              transform: rotate(0);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        }
+
+        .upload-title {
+          font: 20Px Sours Han Sans;
+          color: rgb(130, 130, 130);
+          font-weight: lighter;
+        }
+      }
+
+      $uploadColor: rgb(255, 255, 255, 0.1);
+
+      .upload-animation {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        overflow: hidden;
+        pointer-events: none;
+        background: linear-gradient(135deg, #0000 25%, $uploadColor 0, $uploadColor 50%, #0000 0, #0000 75%, $uploadColor 0);
+        background-size: 15px 15px;
+        animation: upload-background 20s linear infinite;
+        @keyframes upload-background {
+          0% {
+            background-position: 0%;
+          }
+          100% {
+            background-position: 100%;
+          }
+        }
+
+        .uploading-title {
+          font: 20Px Sours Han Sans;
+          color: rgb(130, 130, 130);
+          font-weight: lighter;
+        }
+
+        .uploading-subtitle {
+          font: 12Px Sours Han Sans;
+          color: rgb(130, 130, 130);
+          font-weight: lighter;
+        }
+
+        .animation {
+          width: 10%;
+          height: 1Px;
+          background-color: black;
+          position: absolute;
+          top: 0;
+          left: 10%;
+          animation: upload-animation 3s infinite;
+          transform: rotate(180deg);
+          @keyframes upload-animation {
+            0% {
+              width: 0%;
+              left: 120%;
+            }
+            40% {
+              width: 150%;
+              left: 120%;
+            }
+            65% {
+              width: 0%;
+              left: -30%;
+            }
+            85% {
+              width: 60%;
+            }
+            100% {
+              width: 0%;
+              left: 120%;
+            }
+          }
+        }
+      }
+
+      .drop-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0000 25%, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0.12) 50%, #0000 0, #0000 75%, rgba(255, 255, 255, 0.12) 0);
+        background-size: 14px 14px;
+        animation: drop-overlay-bg 12s linear infinite;
+        @keyframes drop-overlay-bg {
+          0% {
+            background-position: 0%
+          }
+          100% {
+            background-position: 100%
+          }
+        }
+
+        .overlay-inner {
+          text-align: center;
+          transform: translateY(-2px);
+        }
+
+        .overlay-icon {
+          width: 44Px;
+          height: 44Px;
+          margin: 0 auto 8Px auto;
+          position: relative;
+
+          .ring {
+            width: 100%;
+            height: 100%;
+            opacity: .6;
+          }
+
+          .arrow {
+            position: absolute;
+            top: 14%;
+            left: 14%;
+            width: 72%;
+            height: 72%;
+          }
+        }
+
+        .overlay-title {
+          font: 18Px SourceHanSansCN-Bold;
+          letter-spacing: 1Px;
+          color: black;
+        }
+
+        .overlay-sub {
+          margin-top: 2Px;
+          font: 11Px SourceHanSansCN-Bold;
+          color: rgba(0, 0, 0, .75);
+        }
+
+        &.unsupported {
+          outline: 1Px dashed black;
+          outline-offset: -6Px;
+
+          .overlay-title {
+            color: #9a2a2a;
+          }
+
+          .overlay-sub {
+            color: #9a2a2a;
+            opacity: 0.85;
+          }
+        }
+      }
     }
-  }
-  .upload-fade-enter-active,
-  .upload-fade-leave-active {
-    transition: 0.3s cubic-bezier(.14,.91,.58,1);
   }
 
-  .upload-fade-enter-from,
-  .upload-fade-leave-to {
-    transform: scale(0.9);
-    opacity: 0;
+  .disk-right {
+    margin-top: 29Px;
+    margin-left: 50Px;
+    width: 100%;
+    height: calc(100% - 29Px);
   }
+}
+
+.upload-fade-enter-active,
+.upload-fade-leave-active {
+  transition: 0.3s cubic-bezier(.14, .91, .58, 1);
+}
+
+.upload-fade-enter-from,
+.upload-fade-leave-to {
+  transform: scale(0.9);
+  opacity: 0;
+}
 </style>

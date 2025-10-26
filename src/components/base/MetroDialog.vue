@@ -19,9 +19,14 @@ function onAfterEnter() {
   contentVisible.value = true
 }
 
-function onAfterLeave() {
-  showDelay.value = false
+function onBeforeLeave() {
+  // 动画一开始就隐藏内容
   contentVisible.value = false
+}
+
+function onAfterLeave() {
+  contentVisible.value = false
+  showDelay.value = false
 }
 
 watch(() => show, val => {
@@ -30,7 +35,7 @@ watch(() => show, val => {
 </script>
 
 <template>
-  <transition name="metro" @after-enter="onAfterEnter" @after-leave="onAfterLeave">
+  <transition name="metro" @after-enter="onAfterEnter" @after-leave="onAfterLeave" @before-leave="onBeforeLeave">
     <div
       v-if="show"
       :class="{ 'introduce-detail-text-active': showDelay }"
