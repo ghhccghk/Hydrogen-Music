@@ -2,19 +2,11 @@
 import {ref, onMounted} from 'vue'
 import MetroDialog from '@/components/base/MetroDialog.vue'
 
-const props = defineProps({
-  show: {type: Boolean, default: false}
-})
-const emit = defineEmits(['update:show'])
 
 const loading = ref(true)
 const licenses = ref({})
 const openUri = (url) => {
   windowApi.toRegister(url)
-}
-
-function handleClose() {
-  emit('update:show', false)
 }
 
 onMounted(async () => {
@@ -30,7 +22,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <MetroDialog :show="props.show" style="max-height: 80vh;" @close="handleClose">
+  <MetroDialog style="max-height: 80vh;">
     <template v-if="loading">
       <div class="loading">
         <div class="spinner"></div>
@@ -38,21 +30,26 @@ onMounted(async () => {
       </div>
     </template>
 
-    <template v-else>
-      <p class="text" style="padding-bottom: 5px">开源许可</p>
+    <template v-else :hidden="handleClose">
+      <p class="text" style="padding-bottom: 5px;color: #fff;">开源许可</p>
       <div class="licenses">
         <div
           v-for="(info, name) in licenses"
           :key="name"
           class="license-item"
         >
-          <div class="license-name"><strong>{{ name }}</strong></div>
+          <div class="license-name">
+            <strong>{{ name }}</strong>
+          </div>
+
           <div class="license-meta">
             <span class="license-type">{{ info.licenses || 'Unknown' }}</span>
-            <a href="#" @click.prevent="openUri(info.repository)">仓库</a>
+            <span v-if="info.publisher" class="license-author">by {{ info.publisher }}</span>
+            <a v-if="info.repository" href="#" @click.prevent="openUri(info.repository)">仓库</a>
           </div>
         </div>
       </div>
+
     </template>
   </MetroDialog>
 </template>
@@ -134,6 +131,7 @@ onMounted(async () => {
 /* 滑块悬停 */
 .licenses::-webkit-scrollbar-thumb:hover {
   background-color: #999; /* 悬停颜色 */
+  margin-right: 5px;
 }
 
 </style>

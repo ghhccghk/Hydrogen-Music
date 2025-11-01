@@ -1,56 +1,74 @@
 <script setup>
-
 import {ref, watch} from 'vue'
 
-defineProps({
-  show: Boolean,
+const props = defineProps({
+  show: {type: Boolean, default: true},
   description: {
     type: String,
     default: '暂无描述'
   }
 })
-defineEmits(['close'])
+const emit = defineEmits(['close', 'update:show'])
 
 const showDelay = ref(false)
 const contentVisible = ref(false)
 
+/* 动画进入完成后显示内容 */
 function onAfterEnter() {
   showDelay.value = true
   contentVisible.value = true
 }
 
+/* 离开动画前隐藏内容 */
 function onBeforeLeave() {
-  // 动画一开始就隐藏内容
   contentVisible.value = false
+  showDelay.value = false
 }
 
+/* 动画完全结束后重置状态 */
 function onAfterLeave() {
   contentVisible.value = false
   showDelay.value = false
 }
 
-watch(() => show, val => {
-  if (val) contentVisible.value = false
+/* 当外部 show 改变时 */
+watch(() => props.show, (val) => {
+  if (val) {
+    contentVisible.value = false
+  }
 })
+
+/* 关闭逻辑（统一管理） */
+function closeDialog() {
+  contentVisible.value = false
+  emit('update:show', false) // 支持 v-model:show
+  emit('close') // 可选事件
+}
 </script>
 
 <template>
-  <transition name="metro" @after-enter="onAfterEnter" @after-leave="onAfterLeave" @before-leave="onBeforeLeave">
+  <transition
+    name="metro"
+    @after-enter="onAfterEnter"
+    @after-leave="onAfterLeave"
+    @before-leave="onBeforeLeave"
+  >
     <div
-      v-if="show"
+      v-if="props.show"
       :class="{ 'introduce-detail-text-active': showDelay }"
       class="introduce-detail-text"
-      @click.self="$emit('close')"
+      @click.self="closeDialog"
     >
       <!-- 内容容器 -->
-      <slot v-if="contentVisible" class="detail-text"></slot>
+      <div v-show="contentVisible" class="detail-text">
+        <slot></slot>
+      </div>
 
       <!-- 关闭按钮 -->
-      <div class="text-close" @click="$emit('close')">
+      <div class="text-close" @click="closeDialog">
         <svg
           class="icon"
           height="20"
-          t="1671966797621"
           viewBox="0 0 1024 1024"
           width="20"
           xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +184,6 @@ watch(() => show, val => {
   }
 }
 
-/* 动画 */
 .metro-enter-active {
   animation: introduce-detail-in 0.6s 0.3s forwards;
 }
@@ -211,5 +228,4 @@ watch(() => show, val => {
     padding: 0;
   }
 }
-
 </style>
