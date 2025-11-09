@@ -17,7 +17,38 @@ const userStore = useUserStore()
 const libraryStore = useLibraryStore(pinia)
 const playerStore = usePlayerStore(pinia)
 const { libraryInfo } = storeToRefs(libraryStore)
-const { currentMusic, playing, progress, volume, quality, playMode, songList, shuffledList, shuffleIndex, listInfo, songId, currentIndex, time, playlistWidgetShow, playerChangeSong, lyric, lyricsObjArr, lyricShow, lyricEle, isLyricDelay, widgetState, localBase64Img, musicVideo, currentMusicVideo, musicVideoDOM, videoIsPlaying, playerShow, lyricBlur, currentLyricIndex } = storeToRefs(playerStore)
+const refplayerstore = storeToRefs(playerStore)
+const {
+  currentMusic,
+  playing,
+  progress,
+  volume,
+  quality,
+  playMode,
+  songList,
+  shuffledList,
+  shuffleIndex,
+  listInfo,
+  songId,
+  currentIndex,
+  time,
+  playlistWidgetShow,
+  playerChangeSong,
+  lyric,
+  lyricsObjArr,
+  lyricShow,
+  lyricEle,
+  isLyricDelay,
+  widgetState,
+  localBase64Img,
+  musicVideo,
+  currentMusicVideo,
+  musicVideoDOM,
+  videoIsPlaying,
+  playerShow,
+  lyricBlur,
+  currentLyricIndex
+} = refplayerstore
 let isProgress = false
 let musicProgress = null
 let loadLast = true
@@ -28,6 +59,42 @@ let lastRefreshAttempt = 0
 watch(volume, (v) => {
   window.playerApi?.setVolume?.(v)
 })
+
+watch(lyric, (newVal, oldVal) => {
+  console.debug('歌词变化:', newVal.lrc)
+  try {
+    const cur = getCurrentTrack(refplayerstore)
+    // 去掉不可克隆字段，只保留 name/ar 等纯数据
+    const trackData = {
+      name: cur.name,
+      ar: cur.ar.map(ar => ar.name).join(', ')
+    }
+    console.debug('watch 触发, 当前曲目:', cur)
+    console.debug('歌词内容:', newVal.lrc)
+    console.debug('cur内容:', cur)
+
+    if (!cur) {
+      console.debug('cur 为空，无法发送歌词')
+      return
+    }
+
+    if (!newVal || !newVal.lrc.lyric) {
+      console.debug('歌词内容为空:', newVal.lrc.lyric)
+      return
+    }
+
+    window.playerApi.sendLyrics(trackData, newVal.lrc.lyric)
+  } catch (e) {
+    console.debug('发送歌词失败:', e)
+  }
+}, {deep: true})
+
+function getCurrentTrack(storeRefs) {
+  const {songList, currentIndex} = storeRefs
+  const list = songList.value || []
+  const idx = typeof currentIndex.value === 'number' ? currentIndex.value : 0
+  return list[idx] || null
+}
 
 // 统一更新窗口标题和（macOS）Dock菜单
 function updateWindowTitleDock() {
@@ -686,6 +753,7 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
     const localLyric = await getLocalLyric(songList.value[currentIndex.value].url)
     if (localLyric) {
       lyric.value = { lrc: { lyric: localLyric } }
+      console.log('lyric object:', lyric);
       // 处理歌词数据，支持滚动播放
       processLocalLyricData()
     }
@@ -704,6 +772,7 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
       getLyric(id).then(songLiric => {
         lyric.value = songLiric
       })
+      console.log('lyric object:', lyric);
     } else {
       noticeOpen('当前歌曲无法播放', 2)
       clearInterval(musicProgress)

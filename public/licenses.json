@@ -38,17 +38,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@derhuerst/http-basic",
     "licenseFile": "node_modules/@derhuerst/http-basic/LICENSE"
   },
-  "@isaacs/balanced-match@4.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/isaacs/balanced-match",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@isaacs/balanced-match",
-    "licenseFile": "node_modules/@isaacs/balanced-match/LICENSE.md"
-  },
-  "@isaacs/brace-expansion@5.0.0": {
-    "licenses": "MIT",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@isaacs/brace-expansion",
-    "licenseFile": "node_modules/@isaacs/brace-expansion/LICENSE"
-  },
   "@jridgewell/sourcemap-codec@1.5.5": {
     "licenses": "MIT",
     "repository": "https://github.com/jridgewell/sourcemaps",
@@ -165,14 +154,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@vue/shared",
     "licenseFile": "node_modules/@vue/shared/LICENSE"
   },
-  "abbrev@1.1.1": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/abbrev-js",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/abbrev",
-    "licenseFile": "node_modules/abbrev/LICENSE"
-  },
   "accepts@2.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jshttp/accepts",
@@ -220,22 +201,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/ansi-styles",
     "licenseFile": "node_modules/ansi-styles/license"
   },
-  "aproba@1.2.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/aproba",
-    "publisher": "Rebecca Turner",
-    "email": "me@re-becca.org",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/aproba",
-    "licenseFile": "node_modules/aproba/LICENSE"
-  },
-  "are-we-there-yet@1.1.7": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/are-we-there-yet",
-    "publisher": "Rebecca Turner",
-    "url": "http://re-becca.org",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/are-we-there-yet",
-    "licenseFile": "node_modules/are-we-there-yet/LICENSE"
-  },
   "argparse@2.0.1": {
     "licenses": "Python-2.0",
     "repository": "https://github.com/nodeca/argparse",
@@ -248,22 +213,6 @@
     "publisher": "leo",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/args",
     "licenseFile": "node_modules/args/LICENSE"
-  },
-  "asn1@0.2.6": {
-    "licenses": "MIT",
-    "repository": "https://github.com/joyent/node-asn1",
-    "publisher": "Joyent",
-    "url": "joyent.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/asn1",
-    "licenseFile": "node_modules/asn1/LICENSE"
-  },
-  "assert-plus@1.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/mcavage/node-assert-plus",
-    "publisher": "Mark Cavage",
-    "email": "mcavage@gmail.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/assert-plus",
-    "licenseFile": "node_modules/assert-plus/README.md"
   },
   "ast-types@0.13.4": {
     "licenses": "MIT",
@@ -297,24 +246,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/atomically",
     "licenseFile": "node_modules/atomically/LICENSE"
   },
-  "aws-sign2@0.7.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/mikeal/aws-sign",
-    "publisher": "Mikeal Rogers",
-    "email": "mikeal.rogers@gmail.com",
-    "url": "http://www.futurealoof.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/aws-sign2",
-    "licenseFile": "node_modules/aws-sign2/LICENSE"
-  },
-  "aws4@1.13.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/mhart/aws4",
-    "publisher": "Michael Hart",
-    "email": "michael.hart.au@gmail.com",
-    "url": "https://github.com/mhart",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/aws4",
-    "licenseFile": "node_modules/aws4/LICENSE"
-  },
   "axios@1.12.2": {
     "licenses": "MIT",
     "repository": "https://github.com/axios/axios",
@@ -337,21 +268,6 @@
     "email": "patrickjuchli@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/basic-ftp",
     "licenseFile": "node_modules/basic-ftp/LICENSE.txt"
-  },
-  "bcrypt-pbkdf@1.0.2": {
-    "licenses": "BSD-3-Clause",
-    "repository": "https://github.com/joyent/node-bcrypt-pbkdf",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/bcrypt-pbkdf",
-    "licenseFile": "node_modules/bcrypt-pbkdf/LICENSE"
-  },
-  "bindings@1.5.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/TooTallNate/node-bindings",
-    "publisher": "Nathan Rajlich",
-    "email": "nathan@tootallnate.net",
-    "url": "http://tootallnate.net",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/bindings",
-    "licenseFile": "node_modules/bindings/LICENSE.md"
   },
   "body-parser@2.2.0": {
     "licenses": "MIT",
@@ -445,15 +361,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/charenc",
     "licenseFile": "node_modules/charenc/LICENSE.mkd"
   },
-  "chownr@2.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/chownr",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/chownr",
-    "licenseFile": "node_modules/chownr/LICENSE"
-  },
   "cliui@8.0.1": {
     "licenses": "ISC",
     "repository": "https://github.com/yargs/cliui",
@@ -510,15 +417,6 @@
     "url": "https://sindresorhus.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/conf",
     "licenseFile": "node_modules/conf/license"
-  },
-  "console-control-strings@1.1.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/console-control-strings",
-    "publisher": "Rebecca Turner",
-    "email": "me@re-becca.org",
-    "url": "http://re-becca.org/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/console-control-strings",
-    "licenseFile": "node_modules/console-control-strings/LICENSE"
   },
   "content-disposition@1.0.0": {
     "licenses": "MIT",
@@ -593,15 +491,6 @@
     "email": "thekrambuhl@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/custom-event-polyfill",
     "licenseFile": "node_modules/custom-event-polyfill/LICENSE"
-  },
-  "dashdash@1.14.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/trentm/node-dashdash",
-    "publisher": "Trent Mick",
-    "email": "trentm@gmail.com",
-    "url": "http://trentm.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/dashdash",
-    "licenseFile": "node_modules/dashdash/LICENSE.txt"
   },
   "data-uri-to-buffer@6.0.2": {
     "licenses": "MIT",
@@ -698,12 +587,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/delayed-stream",
     "licenseFile": "node_modules/delayed-stream/License"
   },
-  "delegates@1.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/visionmedia/node-delegates",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/delegates",
-    "licenseFile": "node_modules/delegates/License"
-  },
   "depd@2.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/dougwilson/nodejs-depd",
@@ -755,15 +638,6 @@
     "publisher": "Mathias Buus",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/duplexify",
     "licenseFile": "node_modules/duplexify/LICENSE"
-  },
-  "ecc-jsbn@0.1.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/quartzjer/ecc-jsbn",
-    "publisher": "Jeremie Miller",
-    "email": "jeremie@jabber.org",
-    "url": "http://jeremie.com/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/ecc-jsbn",
-    "licenseFile": "node_modules/ecc-jsbn/LICENSE"
   },
   "ee-first@1.1.1": {
     "licenses": "MIT",
@@ -948,21 +822,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/express",
     "licenseFile": "node_modules/express/LICENSE"
   },
-  "extend@3.0.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/justmoon/node-extend",
-    "publisher": "Stefan Thomas",
-    "email": "justmoon@members.fsf.org",
-    "url": "http://www.justmoon.net",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/extend",
-    "licenseFile": "node_modules/extend/LICENSE"
-  },
-  "extsprintf@1.3.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/davepacheco/node-extsprintf",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/extsprintf",
-    "licenseFile": "node_modules/extsprintf/LICENSE"
-  },
   "fast-deep-equal@3.1.3": {
     "licenses": "MIT",
     "repository": "https://github.com/epoberezkin/fast-deep-equal",
@@ -1009,15 +868,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/file-type",
     "licenseFile": "node_modules/file-type/license"
   },
-  "file-uri-to-path@1.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/TooTallNate/file-uri-to-path",
-    "publisher": "Nathan Rajlich",
-    "email": "nathan@tootallnate.net",
-    "url": "http://n8.io/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/file-uri-to-path",
-    "licenseFile": "node_modules/file-uri-to-path/LICENSE"
-  },
   "finalhandler@2.1.0": {
     "licenses": "MIT",
     "repository": "https://github.com/pillarjs/finalhandler",
@@ -1050,15 +900,6 @@
     "url": "https://ruben.verborgh.org/",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/follow-redirects",
     "licenseFile": "node_modules/follow-redirects/LICENSE"
-  },
-  "forever-agent@0.6.1": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/mikeal/forever-agent",
-    "publisher": "Mikeal Rogers",
-    "email": "mikeal.rogers@gmail.com",
-    "url": "http://www.futurealoof.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/forever-agent",
-    "licenseFile": "node_modules/forever-agent/LICENSE"
   },
   "form-data@4.0.4": {
     "licenses": "MIT",
@@ -1101,24 +942,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/fs-extra",
     "licenseFile": "node_modules/fs-extra/LICENSE"
   },
-  "fs-minipass@2.1.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/npm/fs-minipass",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/fs-minipass",
-    "licenseFile": "node_modules/fs-minipass/LICENSE"
-  },
-  "fs.realpath@1.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/fs.realpath",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/fs.realpath",
-    "licenseFile": "node_modules/fs.realpath/LICENSE"
-  },
   "function-bind@1.1.2": {
     "licenses": "MIT",
     "repository": "https://github.com/Raynos/function-bind",
@@ -1134,14 +957,6 @@
     "email": "ljharb@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/functions-have-names",
     "licenseFile": "node_modules/functions-have-names/LICENSE"
-  },
-  "gauge@2.7.4": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/gauge",
-    "publisher": "Rebecca Turner",
-    "email": "me@re-becca.org",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/gauge",
-    "licenseFile": "node_modules/gauge/LICENSE"
   },
   "get-caller-file@2.0.5": {
     "licenses": "ISC",
@@ -1175,23 +990,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/get-uri",
     "licenseFile": "node_modules/get-uri/LICENSE"
   },
-  "getpass@0.1.7": {
-    "licenses": "MIT",
-    "repository": "https://github.com/arekinath/node-getpass",
-    "publisher": "Alex Wilson",
-    "email": "alex.wilson@joyent.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/getpass",
-    "licenseFile": "node_modules/getpass/LICENSE"
-  },
-  "glob@7.2.3": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/node-glob",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/glob",
-    "licenseFile": "node_modules/glob/LICENSE"
-  },
   "gopd@1.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/ljharb/gopd",
@@ -1205,24 +1003,6 @@
     "repository": "https://github.com/isaacs/node-graceful-fs",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/graceful-fs",
     "licenseFile": "node_modules/graceful-fs/LICENSE"
-  },
-  "har-schema@2.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/ahmadnassri/har-schema",
-    "publisher": "Ahmad Nassri",
-    "email": "ahmad@ahmadnassri.com",
-    "url": "https://www.ahmadnassri.com/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/har-schema",
-    "licenseFile": "node_modules/har-schema/LICENSE"
-  },
-  "har-validator@5.1.5": {
-    "licenses": "MIT",
-    "repository": "https://github.com/ahmadnassri/node-har-validator",
-    "publisher": "Ahmad Nassri",
-    "email": "ahmad@ahmadnassri.com",
-    "url": "https://www.ahmadnassri.com/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/har-validator",
-    "licenseFile": "node_modules/har-validator/LICENSE"
   },
   "has-flag@4.0.0": {
     "licenses": "MIT",
@@ -1259,14 +1039,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/has-tostringtag",
     "licenseFile": "node_modules/has-tostringtag/LICENSE"
   },
-  "has-unicode@2.0.1": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/has-unicode",
-    "publisher": "Rebecca Turner",
-    "email": "me@re-becca.org",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/has-unicode",
-    "licenseFile": "node_modules/has-unicode/LICENSE"
-  },
   "hasown@2.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/inspect-js/hasOwn",
@@ -1274,14 +1046,6 @@
     "email": "ljharb@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/hasown",
     "licenseFile": "node_modules/hasown/LICENSE"
-  },
-  "hexy@0.2.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/a2800276/hexy.js",
-    "publisher": "Tim Becker",
-    "email": "tim.becker@kuriositaet.de",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/hexy",
-    "licenseFile": "node_modules/hexy/LICENSE"
   },
   "howler@2.2.4": {
     "licenses": "MIT",
@@ -1317,13 +1081,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/http-response-object",
     "licenseFile": "node_modules/http-response-object/LICENSE"
   },
-  "http-signature@1.2.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/joyent/node-http-signature",
-    "publisher": "Joyent, Inc",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/http-signature",
-    "licenseFile": "node_modules/http-signature/LICENSE"
-  },
   "https-proxy-agent@7.0.6": {
     "licenses": "MIT",
     "repository": "https://github.com/TooTallNate/proxy-agents",
@@ -1358,15 +1115,6 @@
     "url": "https://feross.org",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/ieee754",
     "licenseFile": "node_modules/ieee754/LICENSE"
-  },
-  "inflight@1.0.6": {
-    "licenses": "ISC",
-    "repository": "https://github.com/npm/inflight",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/inflight",
-    "licenseFile": "node_modules/inflight/LICENSE"
   },
   "inherits@2.0.4": {
     "licenses": "ISC",
@@ -1449,32 +1197,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/is-regex",
     "licenseFile": "node_modules/is-regex/LICENSE"
   },
-  "is-typedarray@1.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/hughsk/is-typedarray",
-    "publisher": "Hugh Kennedy",
-    "email": "hughskennedy@gmail.com",
-    "url": "http://hughsk.io/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/is-typedarray",
-    "licenseFile": "node_modules/is-typedarray/LICENSE.md"
-  },
-  "isexe@2.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/isexe",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/isexe",
-    "licenseFile": "node_modules/isexe/LICENSE"
-  },
-  "isstream@0.1.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/rvagg/isstream",
-    "publisher": "Rod Vagg",
-    "email": "rod@vagg.org",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/isstream",
-    "licenseFile": "node_modules/isstream/LICENSE.md"
-  },
   "joycon@3.1.1": {
     "licenses": "MIT",
     "repository": "https://github.com/egoist/joycon",
@@ -1511,13 +1233,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/jsbi",
     "licenseFile": "node_modules/jsbi/LICENSE"
   },
-  "jsbn@0.1.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/andyperlitch/jsbn",
-    "publisher": "Tom Wu",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/jsbn",
-    "licenseFile": "node_modules/jsbn/LICENSE"
-  },
   "json-schema-traverse@0.4.1": {
     "licenses": "MIT",
     "repository": "https://github.com/epoberezkin/json-schema-traverse",
@@ -1531,22 +1246,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/json-schema-typed",
     "licenseFile": "node_modules/json-schema-typed/LICENSE"
   },
-  "json-schema@0.4.0": {
-    "licenses": "(AFL-2.1 OR BSD-3-Clause)",
-    "repository": "https://github.com/kriszyp/json-schema",
-    "publisher": "Kris Zyp",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/json-schema",
-    "licenseFile": "node_modules/json-schema/LICENSE"
-  },
-  "json-stringify-safe@5.0.1": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/json-stringify-safe",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/json-stringify-safe",
-    "licenseFile": "node_modules/json-stringify-safe/LICENSE"
-  },
   "jsonfile@6.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jprichardson/node-jsonfile",
@@ -1554,12 +1253,6 @@
     "email": "jprichardson@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/jsonfile",
     "licenseFile": "node_modules/jsonfile/LICENSE"
-  },
-  "jsprim@1.4.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/joyent/node-jsprim",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/jsprim",
-    "licenseFile": "node_modules/jsprim/LICENSE"
   },
   "lazy-val@1.0.5": {
     "licenses": "MIT",
@@ -1686,44 +1379,11 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/mimic-fn",
     "licenseFile": "node_modules/mimic-fn/license"
   },
-  "minimatch@10.0.3": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/minimatch",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/minimatch",
-    "licenseFile": "node_modules/minimatch/LICENSE"
-  },
-  "minipass@3.3.6": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/minipass",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/minipass",
-    "licenseFile": "node_modules/minipass/LICENSE"
-  },
-  "minizlib@2.1.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/isaacs/minizlib",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/minizlib",
-    "licenseFile": "node_modules/minizlib/LICENSE"
-  },
   "mitt@2.1.0": {
     "licenses": "MIT",
     "repository": "https://github.com/developit/mitt",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/mitt",
     "licenseFile": "node_modules/mitt/README.md"
-  },
-  "mkdirp@1.0.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/isaacs/node-mkdirp",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/mkdirp",
-    "licenseFile": "node_modules/mkdirp/LICENSE"
   },
   "mpris-service@2.1.2": {
     "licenses": "MIT",
@@ -1754,12 +1414,6 @@
     "url": "https://github.com/Borewit",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/music-metadata",
     "licenseFile": "node_modules/music-metadata/LICENSE.txt"
-  },
-  "nan@2.23.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/nodejs/nan",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/nan",
-    "licenseFile": "node_modules/nan/LICENSE.md"
   },
   "nanoid@3.3.11": {
     "licenses": "MIT",
@@ -1792,15 +1446,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/node-forge",
     "licenseFile": "node_modules/node-forge/LICENSE"
   },
-  "node-gyp@7.1.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/nodejs/node-gyp",
-    "publisher": "Nathan Rajlich",
-    "email": "nathan@tootallnate.net",
-    "url": "http://tootallnate.net",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/node-gyp",
-    "licenseFile": "node_modules/node-gyp/LICENSE"
-  },
   "node-windows@1.0.0-beta.8": {
     "licenses": "MIT",
     "repository": "https://github.com/coreybutler/node-windows",
@@ -1809,45 +1454,11 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/node-windows",
     "licenseFile": "node_modules/node-windows/LICENSE"
   },
-  "nopt@6.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/npm/nopt",
-    "publisher": "GitHub Inc.",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/nopt",
-    "licenseFile": "node_modules/nopt/LICENSE"
-  },
   "normalize.css@8.0.1": {
     "licenses": "MIT",
     "repository": "https://github.com/necolas/normalize.css",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/normalize.css",
     "licenseFile": "node_modules/normalize.css/LICENSE.md"
-  },
-  "npmlog@4.1.2": {
-    "licenses": "ISC",
-    "repository": "https://github.com/npm/npmlog",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/npmlog",
-    "licenseFile": "node_modules/npmlog/LICENSE"
-  },
-  "oauth-sign@0.9.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/mikeal/oauth-sign",
-    "publisher": "Mikeal Rogers",
-    "email": "mikeal.rogers@gmail.com",
-    "url": "http://www.futurealoof.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/oauth-sign",
-    "licenseFile": "node_modules/oauth-sign/LICENSE"
-  },
-  "object-assign@4.1.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/sindresorhus/object-assign",
-    "publisher": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/object-assign",
-    "licenseFile": "node_modules/object-assign/license"
   },
   "object-inspect@1.13.4": {
     "licenses": "MIT",
@@ -1963,15 +1574,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/path-exists",
     "licenseFile": "node_modules/path-exists/license"
   },
-  "path-is-absolute@1.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/sindresorhus/path-is-absolute",
-    "publisher": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/path-is-absolute",
-    "licenseFile": "node_modules/path-is-absolute/license"
-  },
   "path-to-regexp@8.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/pillarjs/path-to-regexp",
@@ -1997,14 +1599,6 @@
     "url": "https://github.com/Borewit",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/peek-readable",
     "licenseFile": "node_modules/peek-readable/LICENSE"
-  },
-  "performance-now@2.1.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/braveg1rl/performance-now",
-    "publisher": "Braveg1rl",
-    "email": "braveg1rl@outlook.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/performance-now",
-    "licenseFile": "node_modules/performance-now/license.txt"
   },
   "picocolors@1.1.1": {
     "licenses": "ISC",
@@ -2123,15 +1717,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/proxy-from-env",
     "licenseFile": "node_modules/proxy-from-env/LICENSE"
   },
-  "psl@1.15.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/lupomontero/psl",
-    "publisher": "Lupo Montero",
-    "email": "lupomontero@gmail.com",
-    "url": "https://lupomontero.com/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/psl",
-    "licenseFile": "node_modules/psl/LICENSE"
-  },
   "pump@3.0.3": {
     "licenses": "MIT",
     "repository": "https://github.com/mafintosh/pump",
@@ -2217,14 +1802,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/regexp.prototype.flags",
     "licenseFile": "node_modules/regexp.prototype.flags/LICENSE"
   },
-  "request@2.88.2": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/request/request",
-    "publisher": "Mikeal Rogers",
-    "email": "mikeal.rogers@gmail.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/request",
-    "licenseFile": "node_modules/request/LICENSE"
-  },
   "require-directory@2.1.1": {
     "licenses": "MIT",
     "repository": "https://github.com/troygoode/node-require-directory",
@@ -2241,15 +1818,6 @@
     "email": "david.clements@nearform.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/rfdc",
     "licenseFile": "node_modules/rfdc/LICENSE"
-  },
-  "rimraf@3.0.2": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/rimraf",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/rimraf",
-    "licenseFile": "node_modules/rimraf/LICENSE"
   },
   "router@2.2.0": {
     "licenses": "MIT",
@@ -2322,14 +1890,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/serve-static",
     "licenseFile": "node_modules/serve-static/LICENSE"
   },
-  "set-blocking@2.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/yargs/set-blocking",
-    "publisher": "Ben Coe",
-    "email": "ben@npmjs.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/set-blocking",
-    "licenseFile": "node_modules/set-blocking/LICENSE.txt"
-  },
   "set-function-length@1.2.2": {
     "licenses": "MIT",
     "repository": "https://github.com/ljharb/set-function-length",
@@ -2384,14 +1944,6 @@
     "email": "ljharb@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/side-channel",
     "licenseFile": "node_modules/side-channel/LICENSE"
-  },
-  "signal-exit@3.0.7": {
-    "licenses": "ISC",
-    "repository": "https://github.com/tapjs/signal-exit",
-    "publisher": "Ben Coe",
-    "email": "ben@npmjs.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/signal-exit",
-    "licenseFile": "node_modules/signal-exit/LICENSE.txt"
   },
   "smart-buffer@4.2.0": {
     "licenses": "MIT",
@@ -2462,13 +2014,6 @@
     "url": "http://bit.ly/dominictarr",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/split",
     "licenseFile": "node_modules/split/LICENCE"
-  },
-  "sshpk@1.18.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/joyent/node-sshpk",
-    "publisher": "Joyent, Inc",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/sshpk",
-    "licenseFile": "node_modules/sshpk/LICENSE"
   },
   "statuses@2.0.2": {
     "licenses": "MIT",
@@ -2551,13 +2096,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/supports-color",
     "licenseFile": "node_modules/supports-color/license"
   },
-  "tar@6.2.1": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/node-tar",
-    "publisher": "GitHub Inc.",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tar",
-    "licenseFile": "node_modules/tar/LICENSE"
-  },
   "through@2.3.8": {
     "licenses": "MIT",
     "repository": "https://github.com/dominictarr/through",
@@ -2591,29 +2129,12 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/token-types",
     "licenseFile": "node_modules/token-types/LICENSE"
   },
-  "tough-cookie@2.5.0": {
-    "licenses": "BSD-3-Clause",
-    "repository": "https://github.com/salesforce/tough-cookie",
-    "publisher": "Jeremy Stashewsky",
-    "email": "jstash@gmail.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tough-cookie",
-    "licenseFile": "node_modules/tough-cookie/LICENSE"
-  },
   "tslib@2.8.1": {
     "licenses": "0BSD",
     "repository": "https://github.com/Microsoft/tslib",
     "publisher": "Microsoft Corp.",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tslib",
     "licenseFile": "node_modules/tslib/LICENSE.txt"
-  },
-  "tunnel-agent@0.6.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/mikeal/tunnel-agent",
-    "publisher": "Mikeal Rogers",
-    "email": "mikeal.rogers@gmail.com",
-    "url": "http://www.futurealoof.com",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tunnel-agent",
-    "licenseFile": "node_modules/tunnel-agent/LICENSE"
   },
   "tunnel@0.0.6": {
     "licenses": "MIT",
@@ -2622,13 +2143,6 @@
     "email": "koichik@improvement.jp",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tunnel",
     "licenseFile": "node_modules/tunnel/LICENSE"
-  },
-  "tweetnacl@0.14.5": {
-    "licenses": "Unlicense",
-    "repository": "https://github.com/dchest/tweetnacl-js",
-    "publisher": "TweetNaCl-js contributors",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/tweetnacl",
-    "licenseFile": "node_modules/tweetnacl/LICENSE"
   },
   "type-fest@2.19.0": {
     "licenses": "(MIT OR CC0-1.0)",
@@ -2698,14 +2212,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/url-polyfill",
     "licenseFile": "node_modules/url-polyfill/LICENSE"
   },
-  "usocket@0.3.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/jhs67/usocket",
-    "publisher": "Jon Spencer",
-    "email": "jon@jonspencer.ca",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/usocket",
-    "licenseFile": "node_modules/usocket/LICENSE"
-  },
   "util-deprecate@1.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/TooTallNate/util-deprecate",
@@ -2714,12 +2220,6 @@
     "url": "http://n8.io/",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/util-deprecate",
     "licenseFile": "node_modules/util-deprecate/LICENSE"
-  },
-  "uuid@3.4.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/uuidjs/uuid",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/uuid",
-    "licenseFile": "node_modules/uuid/LICENSE.md"
   },
   "vary@1.1.2": {
     "licenses": "MIT",
@@ -2784,24 +2284,6 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/vue",
     "licenseFile": "node_modules/vue/LICENSE"
   },
-  "which@2.0.2": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/node-which",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/which",
-    "licenseFile": "node_modules/which/LICENSE"
-  },
-  "wide-align@1.1.5": {
-    "licenses": "ISC",
-    "repository": "https://github.com/iarna/wide-align",
-    "publisher": "Rebecca Turner",
-    "email": "me@re-becca.org",
-    "url": "http://re-becca.org/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/wide-align",
-    "licenseFile": "node_modules/wide-align/LICENSE"
-  },
   "wrap-ansi@7.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/chalk/wrap-ansi",
@@ -2852,15 +2334,6 @@
     "email": "bencoe@gmail.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/y18n",
     "licenseFile": "node_modules/y18n/LICENSE"
-  },
-  "yallist@4.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/isaacs/yallist",
-    "publisher": "Isaac Z. Schlueter",
-    "email": "i@izs.me",
-    "url": "http://blog.izs.me/",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/yallist",
-    "licenseFile": "node_modules/yallist/LICENSE"
   },
   "yargs-parser@21.1.1": {
     "licenses": "ISC",

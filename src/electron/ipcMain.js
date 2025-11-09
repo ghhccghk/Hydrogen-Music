@@ -203,6 +203,9 @@ module.exports = IpcMainEvent = (win, app, lyricFunctions = {}) => {
         other: {
           globalShortcuts: true,
           quitApp: 'minimize'
+        },
+        lyric: {
+          enableOsdlyricsSupport: false
         }
       }
       settingsStore.set('settings', initSettings)

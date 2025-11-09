@@ -25,6 +25,8 @@ export const initSettings = () => {
         localSotre.downloadedFolderSettings = settings.local.downloadFolder
         localSotre.localFolderSettings = settings.local.localFolder
         localSotre.quitApp = settings.other.quitApp
+      localSotre.enableOsdlyricsSupport = settings.lyric.enableOsdlyricsSupport
+
         if (localSotre.downloadedFolderSettings && !localSotre.downloadedMusicFolder) {
             scanMusic({ type: 'downloaded', refresh: false })
         }

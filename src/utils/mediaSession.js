@@ -3,7 +3,38 @@ import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {usePlayerStore} from '@/store/playerStore'
 import { startMusic, pauseMusic, playNext, playLast, changeProgress } from './player'
-import {isCreateMpris} from "@/utils/platform";
+
+
+playerApi.onSaveLyricFinished(() => {
+  const playerStore = usePlayerStore(pinia)
+  const refs = storeToRefs(playerStore)
+  const cur = getCurrentTrack(refs)
+  if (!cur) return
+  const title = cur.name || cur.localName || 'Hydrogen Music'
+  const artist = Array.isArray(cur.ar) ? cur.ar.map(a => a && a.name).filter(Boolean).join(', ') : (cur.artist || '')
+  const album = (cur.al && cur.al.name) || cur.album || ''
+  const metadata = {
+    title: title,
+    artUrl: artist,
+    artist: artist,
+    album: album,
+    artwork: [
+      {
+        src: cur.al.picUrl + '?param=224y224',
+        type: 'image/jpg',
+        sizes: '224x224',
+      },
+      {
+        src: cur.al.picUrl + '?param=512y512',
+        type: 'image/jpg',
+        sizes: '512x512',
+      },
+    ],
+    length: Number(time.value) || 10
+  };
+
+  playerApi.sendMetaData(metadata);
+});
 
 function getCurrentTrack(storeRefs) {
   const { songList, currentIndex } = storeRefs
@@ -122,7 +153,9 @@ export function initMediaSession() {
         ],
         length: Number(time.value) || 10
       };
-      playerApi.sendMetaData(metadata);
+      if (true) {
+        playerApi.sendMetaData(metadata);
+      }
       navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
     } catch (e) {
       console.log("mediaSession,metadata" + e)

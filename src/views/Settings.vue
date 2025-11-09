@@ -72,6 +72,7 @@ const themeOptions = ref([
   { label: '深色', value: 'dark' },
 ]);
 const showOpenSource = ref(false)
+const enableOsdlyricsSupport = ref(false)
 const version = __APP_VERSION__
 
 if (isLogin()) {
@@ -94,6 +95,7 @@ onActivated(() => {
     globalShortcuts.value = settings.other.globalShortcuts
     quitApp.value = settings.other.quitApp
     customFont.value = settings.other.customFont
+    enableOsdlyricsSupport.value = settings.lyric.enableOsdlyricsSupport
   })
 
   // Initialize theme selection
@@ -125,6 +127,9 @@ const setAppSettings = () => {
       globalShortcuts: globalShortcuts.value,
       quitApp: quitApp.value,
       customFont: customFont.value,
+    },
+    lyric: {
+      enableOsdlyricsSupport: enableOsdlyricsSupport.value
     }
   }
   windowApi.setSettings(JSON.stringify(settings))
@@ -511,6 +516,19 @@ const clearFmRecent = () => {
               <div class="option-name">主题</div>
               <div class="option-operation">
                 <Selector v-model="theme" :options="themeOptions"></Selector>
+              </div>
+            </div>
+            <div class="option">
+              <div class="option-name">开启Osdlyrics 支持</div>
+              <div class="option-operation">
+                <div class="toggle" @click="enableOsdlyricsSupport = !enableOsdlyricsSupport">
+                  <div :class="{ 'toggle-on-in': enableOsdlyricsSupport }" class="toggle-off">
+                    {{ enableOsdlyricsSupport ? '已开启' : '已关闭' }}
+                  </div>
+                  <Transition name="toggle">
+                    <div v-show="enableOsdlyricsSupport" class="toggle-on"></div>
+                  </Transition>
+                </div>
               </div>
             </div>
             <div class="option">

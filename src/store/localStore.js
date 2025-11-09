@@ -24,6 +24,7 @@ export const useLocalStore = defineStore('localStore', {
             isRefreshLocalFile: false,
 
             quitApp: null,
+          enableOsdlyricsSupport: false,
         }
     },
     actions: {

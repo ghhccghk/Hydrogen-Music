@@ -5,7 +5,7 @@ const LocalFiles = require('./electron/localmusic')
 const InitTray = require('./electron/tray')
 const registerShortcuts = require('./electron/shortcuts')
 const {isCreateMpris, isLinux} = require('./utils/platform');
-const {createMpris} = require('./electron/mpris');
+const {createMpris, createDbus} = require('./electron/mpris');
 
 const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
 const Winstate = require('electron-win-state').default
@@ -41,6 +41,8 @@ if (!gotTheLock) {
 
   // 尝试启用平台 HEVC 硬件解码（在支持的平台上）
   try {
+    app.commandLine.appendSwitch('no-sandbox')
+
     app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport')
     // 某些平台可能需要忽略 GPU 黑名单以启用硬件解码
     app.commandLine.appendSwitch('ignore-gpu-blocklist')
@@ -86,7 +88,7 @@ if (!gotTheLock) {
     forceQuit = true;
   });
 }
-const createWindow = () => {
+const createWindow = async () => {
   // 设置应用名称（在开发模式下也生效）
   app.setName('Hydrogen Music')
   process.env.DIST = path.join(__dirname, '../')
@@ -111,6 +113,7 @@ const createWindow = () => {
       //预加载脚本
       preload: path.resolve(__dirname, './electron/preload.js'),
       webSecurity: false,
+      sandbox: false
     }
   })
   myWindow = win
@@ -129,6 +132,7 @@ const createWindow = () => {
     // }
   })
   winstate.manage(win)
+  const settings = await settingsStore.get('settings');
   win.on('close', async (event) => {
 
     if (forceQuit) {
@@ -140,7 +144,6 @@ const createWindow = () => {
     // 在macOS上，'close'事件通常意味着窗口将被销毁，而不是隐藏
     if (process.platform === 'darwin') {
       // 如果用户设置为“最小化”，则阻止关闭并隐藏窗口
-      const settings = await settingsStore.get('settings');
       if (settings && settings.other && settings.other.quitApp === 'minimize') {
         event.preventDefault();
         win.hide();
@@ -152,7 +155,6 @@ const createWindow = () => {
     } else {
       // 在非macOS平台上，保留您原有的逻辑
       event.preventDefault();
-      const settings = await settingsStore.get('settings');
       if (settings && settings.other && settings.other.quitApp === 'minimize') {
         win.hide();
       } else if (settings && settings.other && settings.other.quitApp === 'quit') {
@@ -169,15 +171,24 @@ const createWindow = () => {
 
   })
   //ipcMain初始化
-  IpcMainEvent(win, app, { createLyricWindow, closeLyricWindow, setLyricWindowMovable, getLyricWindow: () => lyricWindow })
+  IpcMainEvent(win, app, {
+    createLyricWindow,
+    closeLyricWindow,
+    setLyricWindowMovable,
+    getLyricWindow: () => lyricWindow
+  })
   MusicDownload(win)
   LocalFiles(win, app)
   InitTray(win, app, path.resolve(__dirname, iconPath))
-  registerShortcuts(win)
+  await registerShortcuts(win)
 
   // create mpris
   if (isCreateMpris) {
     createMpris(win);
+    // try to start osdlyrics process on start
+    if (settings.lyric.enableOsdlyricsSupport) {
+      await createDbus(win);
+    }
   }
 }
 

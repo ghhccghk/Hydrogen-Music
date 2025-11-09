@@ -263,6 +263,14 @@ contextBridge.exposeInMainWorld('playerApi', {
   // 切换循环模式
   switchRepeatMode: (mode) => ipcRenderer.send('switchRepeatMode', mode), // mode: 'off' | 'one' | 'on'
 
+  // 保存歌词到 Osdlyric
+  sendLyrics: (track, lyrics) => ipcRenderer.send('sendLyrics', {track, lyrics}),
+
+  onSaveLyricFinished: (callback) => {
+    ipcRenderer.on('saveLyricFinished', () => {
+      callback();
+    });
+  },
   // 切换随机播放
   switchShuffle: (shuffle) => ipcRenderer.send('switchShuffle', shuffle), // shuffle: true/false
   sendMetaData,
