@@ -102,7 +102,7 @@ const createWindow = () => {
     minHeight: 672,
     frame: false,
     title: "Hydrogen Music",
-    icon: path.resolve(__dirname, './assets/icon/' + (process.platform === 'win32' ? 'icon.ico' : 'icon.png')),
+    icon: getAppIconPath(),
     backgroundColor: '#fff',
     //记录窗口大小
     ...winstate.winOptions,
@@ -302,3 +302,13 @@ const setLyricWindowMovable = (movable) => {
 }
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
+function getAppIconPath() {
+  if (process.platform === 'win32') {
+    return path.join(__dirname, './assets/icon/icon.ico');
+  } else if (process.platform === 'darwin') {
+    return path.join(__dirname, './assets/icon/icon.icns');
+  } else {
+    return path.join(__dirname, './assets/icon/icon.png');
+  }
+}
