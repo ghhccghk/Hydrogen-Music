@@ -1,15 +1,14 @@
 import pinia from '../store/pinia'
-import { Howl, Howler } from 'howler'
-import { formatDuration } from './time';
-import { noticeOpen } from './dialog'
-import { checkMusic, getMusicUrl, likeMusic, getLyric } from '@/api/song'
-import { getLikelist, getUserPlaylist } from '@/api/user'
-import { useUserStore } from '@/store/userStore'
-import { usePlayerStore } from '@/store/playerStore'
-import { useLibraryStore } from '@/store/libraryStore'
-import { useOtherStore } from '@/store/otherStore'
-import { storeToRefs } from 'pinia'
-import {isCreateMpris} from "@/utils/platform";
+import {Howl, Howler} from 'howler'
+import {formatDuration} from './time';
+import {noticeOpen} from './dialog'
+import {checkMusic, getLyric, getMusicUrl, likeMusic} from '@/api/song'
+import {getLikelist, getUserPlaylist} from '@/api/user'
+import {useUserStore} from '@/store/userStore'
+import {usePlayerStore} from '@/store/playerStore'
+import {useLibraryStore} from '@/store/libraryStore'
+import {useOtherStore} from '@/store/otherStore'
+import {storeToRefs} from 'pinia'
 import {watch} from "vue";
 
 const otherStore = useOtherStore()
@@ -17,7 +16,6 @@ const userStore = useUserStore()
 const libraryStore = useLibraryStore(pinia)
 const playerStore = usePlayerStore(pinia)
 const { libraryInfo } = storeToRefs(libraryStore)
-const refplayerstore = storeToRefs(playerStore)
 const {
   currentMusic,
   playing,
@@ -48,7 +46,8 @@ const {
   playerShow,
   lyricBlur,
   currentLyricIndex
-} = refplayerstore
+} = storeToRefs(playerStore)
+
 let isProgress = false
 let musicProgress = null
 let loadLast = true
@@ -60,72 +59,6 @@ watch(volume, (v) => {
   window.playerApi?.setVolume?.(v)
 })
 
-watch(lyric, (newVal, oldVal) => {
-  try {
-    const cur = getCurrentTrack(refplayerstore)
-    // 去掉不可克隆字段，只保留 name/ar 等纯数据
-    const trackData = {
-      name: cur.name,
-      ar: cur.ar.map(ar => ar.name).join(', ')
-    }
-
-    if (!cur) {
-      console.debug('cur 为空，无法发送歌词')
-      return
-    }
-
-    if (!newVal || !newVal.lrc.lyric) {
-      console.debug('歌词内容为空:', newVal.lrc.lyric)
-      return
-    }
-
-    window.playerApi.sendLyrics(trackData, newVal.lrc.lyric)
-  } catch (e) {
-    console.debug('发送歌词失败:', e)
-  }
-}, {deep: true})
-
-
-playerApi.onSaveLyricFinished(() => {
-  const playerStore = usePlayerStore(pinia)
-  const refs = storeToRefs(playerStore)
-  const cur = getCurrentTrack(refs)
-  if (!cur) return
-  console.debug(cur)
-  const title = cur.name || cur.localName || 'Hydrogen Music'
-  let artists = cur.ar.map(a => a.name);
-  const album = (cur.al && cur.al.name) || cur.album || ''
-  const metadata = {
-    title: title,
-    artist: artists.join(','),
-    album: album,
-    artwork: [
-      {
-        src: cur.al.picUrl + '?param=224y224',
-        type: 'image/jpg',
-        sizes: '224x224',
-      },
-      {
-        src: cur.al.picUrl + '?param=512y512',
-        type: 'image/jpg',
-        sizes: '512x512',
-      },
-    ],
-    length: Number(time.value) || 10,
-    trackId: 0,
-    url: '/trackid/' + 0,
-  };
-
-  playerApi.sendMetaData(metadata);
-});
-
-function getCurrentTrack(storeRefs) {
-  const {songList, currentIndex} = storeRefs
-  const list = songList.value || []
-  const idx = typeof currentIndex.value === 'number' ? currentIndex.value : 0
-  return list[idx] || null
-}
-
 // 统一更新窗口标题和（macOS）Dock菜单
 function updateWindowTitleDock() {
   try {
@@ -134,7 +67,7 @@ function updateWindowTitleDock() {
     const cur = curList[idx]
     if (!cur) {
       // 无当前歌曲，恢复默认标题
-      window.windowApi.setWindowTile('Hydrogen Music')
+      windowApi.setWindowTile('Hydrogen Music')
       return
     }
     const sName = cur.name || cur.localName || 'Hydrogen Music'
@@ -143,10 +76,10 @@ function updateWindowTitleDock() {
     const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''
     const isMac = /Mac/i.test(platform)
     if (isMac) {
-      window.windowApi.updateDockMenu({ name: sName, artist: aName })
+      windowApi.updateDockMenu({name: sName, artist: aName})
     } else {
       const title = aName ? `${sName} - ${aName}` : sName
-      window.windowApi.setWindowTile(title)
+      windowApi.setWindowTile(title)
     }
   } catch (e) {
     // 保底不抛错
@@ -174,7 +107,7 @@ export function checkAndLoadVideoForCurrentSong() {
   }
 
   // 立即检查当前歌曲是否有对应的视频文件
-  window.windowApi.musicVideoIsExists({ id: songId.value, method: 'verify' }).then(result => {
+  windowApi.musicVideoIsExists({id: songId.value, method: 'verify'}).then(result => {
     // 验证歌曲ID是否仍然匹配（防止快速切歌）
     if (result && result !== '404' && result !== false && result.data &&
       result.data.path && result.data.id === songId.value &&
@@ -268,7 +201,7 @@ export function isVideoClosedByUser(songId) {
 
 export function loadLastSong() {
   if (loadLast) {
-    window.windowApi.getLastPlaylist().then(list => {
+    windowApi.getLastPlaylist().then(list => {
       if (list) {
         songList.value = list.songList
         shuffledList.value = list.shuffledList
@@ -337,11 +270,14 @@ async function refreshStreamAndResume(eventType, error) {
 }
 
 export function play(url, autoplay, resumeSeek = null) {
+  // 切歌或重新播放前，先停止旧的进度计时，避免残留一帧旧进度覆盖UI
+  clearInterval(musicProgress)
   if (currentMusic.value) {
     currentMusic.value.unload()
     Howler.unload()
   }
-
+  // 播放前更新音量
+  window.playerApi?.setVolume?.(volume.value)
   // 每次播放新音乐时，检查当前歌曲是否有对应的视频
   checkAndLoadVideoForCurrentSong()
 
@@ -393,7 +329,12 @@ export function play(url, autoplay, resumeSeek = null) {
 
       // 原有的播放结束逻辑（非FM模式）
       if (playMode.value == 0 && currentIndex.value < songList.value.length - 1) { playNext(); return } //顺序播放
-      if (playMode.value == 0 && currentIndex.value == songList.value.length - 1) { playing.value = false; playModeOne = true; window.windowApi.playOrPauseMusicCheck(playing.value); return } //顺序播放结束暂停状态
+      if (playMode.value == 0 && currentIndex.value == songList.value.length - 1) {
+        playing.value = false;
+        playModeOne = true;
+        windowApi.playOrPauseMusicCheck(playing.value);
+        return
+      } //顺序播放结束暂停状态
       if (playMode.value == 1) { playNext(); return } //列表循环
       if (playMode.value == 3) { playNext() } //随机播放(为列表循环)
       if (playMode.value == 2) { clearLycAnimation() } // 单曲循环播放结束时清除歌词动画
@@ -419,26 +360,23 @@ export function play(url, autoplay, resumeSeek = null) {
     playerChangeSong.value = false
     // 通知 Media Session：新曲目加载完成，刷新一次系统时长/进度（静态策略）
     try {
-      if (!isCreateMpris) {
-        window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-          detail: {duration: Math.floor(currentMusic.value.duration() || 0), toTime: progress.value || 0}
-        }))
-      }
-
+      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+        detail: {duration: Math.floor(currentMusic.value.duration() || 0), toTime: progress.value || 0}
+      }))
     } catch (_) {}
   })
   currentMusic.value.on('play', () => {
     currentMusic.value.fade(0, volume.value, 200)
     startProgress()
     playing.value = true
-    window.windowApi.playOrPauseMusicCheck(playing.value)
+    windowApi.playOrPauseMusicCheck(playing.value)
     // 切歌/播放开始时统一更新窗口标题与（macOS）Dock 菜单
     updateWindowTitleDock()
   })
   currentMusic.value.on('pause', () => {
     clearInterval(musicProgress)
     playing.value = false
-    window.windowApi.playOrPauseMusicCheck(playing.value)
+    windowApi.playOrPauseMusicCheck(playing.value)
     currentMusic.value.fade(volume.value, 0, 200)
   })
 }
@@ -592,7 +530,7 @@ export function loadMusicVideo(id) {
 
   // 等待一个短暂的时间确保清理完成，然后检查视频
   setTimeout(() => {
-    window.windowApi.musicVideoIsExists({ id: id, method: 'verify' }).then(result => {
+    windowApi.musicVideoIsExists({id: id, method: 'verify'}).then(result => {
       // 严格检查 - 只有明确返回有效结果且文件存在时才加载视频
       if (result && result !== '404' && result !== false && result.data && result.data.path && result.data.id === id) {
         // 再次验证当前歌曲ID是否仍然匹配（防止快速切歌导致的异步问题）
@@ -621,16 +559,18 @@ export function loadMusicVideo(id) {
 export function addSong(id, index, autoplay, isLocal) {
   // 主动切歌：从头开始播放，不恢复上次进度
   loadLast = false
+  // 先停止旧的进度计时，避免残留计时在下一秒把UI回写为上一首的进度
+  clearInterval(musicProgress)
+  // 立即重置前端进度与时长，避免看到上一首的进度与时长
   progress.value = 0
+  time.value = 0
   // 清空上首的本地封面，避免下一首短暂使用上一首封面
   try { localBase64Img.value = null } catch (_) {}
   // 立即通知 SMTC/Media Session 将进度归零，避免保留上一首的时间轴
   try {
-    if (!isCreateMpris) {
-      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-        detail: {duration: 0, toTime: 0}
-      }))
-    }
+    window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+      detail: {duration: 0, toTime: 0}
+    }))
   } catch (_) {}
   if (lyricShow.value) {
     lyricShow.value = false
@@ -668,7 +608,7 @@ export function setSongLevel(level) {
   songList.value[currentIndex.value].quality = level
 }
 export async function getLocalLyric(filePath) {
-  const lyric = await window.windowApi.getLocalMusicLyric(filePath)
+  const lyric = await windowApi.getLocalMusicLyric(filePath)
   if (lyric) return lyric
   else return false
 }
@@ -682,15 +622,16 @@ function processLocalLyricData() {
 
   try {
     const regNewLine = /\n/
-    const regTime = /\[(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?\]/g
+    // 更宽松的 LRC 时间标签：允许 : ： . ． 。 , ， ; ； / - _ 或空白作为分隔
+    const regTime = /\[(\d{1,3})\s*[:：\.\uFF0E\u3002,，;；\/\-_\s]\s*(\d{1,2})(?:\s*[:：\.\uFF0E\u3002,，;；\/\-_\s]\s*(\d{1,3}))?\]/g
 
     // 时间解析函数（返回秒，保留毫秒）
     const parseTime = (timeStr) => {
-      const m = timeStr.match(/\[(\d{1,2}):(\d{1,2})\.?(\d{0,3})\]/)
+      const m = timeStr.match(/\[(\d{1,3})\s*[:：\.\uFF0E\u3002,，;；\/\-_\s]\s*(\d{1,2})(?:\s*[:：\.\uFF0E\u3002,，;；\/\-_\s]\s*(\d{1,3}))?\]/)
       if (!m) return 0
       const min = parseInt(m[1]) || 0
       const sec = parseInt(m[2]) || 0
-      const ms = m[3] ? parseInt(m[3].padEnd(3, '0')) : 0
+      const ms = m[3] ? parseInt((m[3] + '00').slice(0, 3)) : 0
       return min * 60 + sec + ms / 1000
     }
 
@@ -754,21 +695,19 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
   const isMac = /Mac/i.test(platform)
   if (isMac) {
     // 更新 Dock 菜单（仅在 macOS 上）
-    window.windowApi.updateDockMenu({ name: songName, artist: artistName })
+    windowApi.updateDockMenu({name: songName, artist: artistName})
   } else {
     // 更新窗口标题（Windows/Linux）
     const title = artistName ? `${songName} - ${artistName}` : songName
-    window.windowApi.setWindowTile(title)
+    windowApi.setWindowTile(title)
   }
 
   if (isLocal) {
-    window.windowApi.getLocalMusicImage(songList.value[currentIndex.value].url).then(base64 => {
+    windowApi.getLocalMusicImage(songList.value[currentIndex.value].url).then(base64 => {
       localBase64Img.value = base64
       // 本地封面到达后，提示 Media Session 刷新一次元数据（以载入封面）
       try {
-        if (!isCreateMpris) {
-          window.dispatchEvent(new CustomEvent('mediaSession:updateArtwork'))
-        }
+        window.dispatchEvent(new CustomEvent('mediaSession:updateArtwork'))
       } catch (_) {
       }
     })
@@ -783,7 +722,6 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
     const localLyric = await getLocalLyric(songList.value[currentIndex.value].url)
     if (localLyric) {
       lyric.value = { lrc: { lyric: localLyric } }
-      console.log('lyric object:', lyric);
       // 处理歌词数据，支持滚动播放
       processLocalLyricData()
     }
@@ -802,7 +740,6 @@ export async function getSongUrl(id, index, autoplay, isLocal) {
       getLyric(id).then(songLiric => {
         lyric.value = songLiric
       })
-      console.log('lyric object:', lyric);
     } else {
       noticeOpen('当前歌曲无法播放', 2)
       clearInterval(musicProgress)
@@ -989,11 +926,9 @@ export function changeProgress(toTime) {
   currentMusic.value.seek(toTime)
   // 静态策略下，仅在显式 seek 时通知一次系统进度
   try {
-    if (!isCreateMpris) {
-      window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
-        detail: {duration: Math.floor(time.value || 0), toTime}
-      }))
-    }
+    window.dispatchEvent(new CustomEvent('mediaSession:seeked', {
+      detail: {duration: Math.floor(time.value || 0), toTime}
+    }))
   } catch (_) {}
 }
 //控制拖拽进度条
@@ -1006,7 +941,6 @@ export function changeProgressByDragEnd(toTime) {
 }
 // ------------
 export function changePlayMode() {
-  //0为顺序播放，1为列表循环，2为单曲循环，3为随机播放
   // FM模式下的特殊切换逻辑：只在模式2（单曲循环）和模式3（随机播放）之间切换
   if (listInfo.value && listInfo.value.type === 'personalfm') {
     if (playMode.value == 2) {
@@ -1263,7 +1197,7 @@ export function savePlaylist() {
     songList: songList.value,
     shuffledList: shuffledList.value
   }
-  window.windowApi.saveLastPlaylist(JSON.stringify(list))
+  windowApi.saveLastPlaylist(JSON.stringify(list))
 }
 export function songTime(dt) {
   if (dt) {
@@ -1371,12 +1305,12 @@ export function musicVideoCheck(seek, update) {
   }
 }
 
-function setVolume(value) {
+
+function setVolumeForPlay(value) {
   volume.value = Math.max(0, Math.min(1, value))
   console.log(volume.value)
   currentMusic.value.volume(volume.value)
 }
-
 
 
 window.addEventListener('mousedown', (e) => {
@@ -1403,15 +1337,15 @@ window.addEventListener('click', (e) => {
   else if (otherStore.videoIsBlur && otherStore.videoPlayerShow && document.getElementById('videoPlayer').contains(e.target) == true && document.getElementsByClassName('plyr__controls')[0].contains(e.target) != true) otherStore.videoIsBlur = false
   if (userStore.appOptionShow && document.getElementsByClassName('user-head')[0].contains(e.target) != true) userStore.appOptionShow = false
 })
-window.windowApi.playOrPauseMusic((event) => {
+windowApi.playOrPauseMusic((event) => {
   if (playing.value) pauseMusic()
   else startMusic()
 })
-window.windowApi.lastOrNextMusic((event, option) => {
+windowApi.lastOrNextMusic((event, option) => {
   if (option == 'last') playLast()
   else if (option == 'next') playNext()
 })
-window.windowApi.changeMusicPlaymode((event, mode) => {
+windowApi.changeMusicPlaymode((event, mode) => {
   if (playMode.value != mode) playMode.value = mode
   if (playMode.value == 2) currentMusic.value.loop(true) //循环模式
   else currentMusic.value.loop(false)
@@ -1422,18 +1356,17 @@ window.windowApi.changeMusicPlaymode((event, mode) => {
     shuffleIndex.value = null
   }
 })
-
-window.windowApi.volumeUp(() => {
+windowApi.volumeUp(() => {
   if (volume.value + 0.1 < 1) volume.value += 0.1
   else volume.value = 1
   currentMusic.value.volume(volume.value)
 })
-window.windowApi.volumeDown(() => {
+windowApi.volumeDown(() => {
   if (volume.value - 0.1 > 0) volume.value -= 0.1
   else volume.value = 0
   currentMusic.value.volume(volume.value)
 })
-window.windowApi.musicProcessControl((event, mode) => {
+windowApi.musicProcessControl((event, mode) => {
   if (mode == 'forward') {
     if (progress.value + 3 < currentMusic.value.duration()) progress.value += 3
     else progress.value = currentMusic.value.duration()
@@ -1444,17 +1377,18 @@ window.windowApi.musicProcessControl((event, mode) => {
   // 统一使用 changeProgress，确保歌词、视频等状态同步
   changeProgress(progress.value)
 })
-window.windowApi.playOrPauseMusicCheck(playing.value)
-window.windowApi.changeTrayMusicPlaymode(playMode.value)
-window.windowApi.beforeQuit(() => {
+windowApi.playOrPauseMusicCheck(playing.value)
+windowApi.changeTrayMusicPlaymode(playMode.value)
+windowApi.beforeQuit(() => {
   //关闭之前清除下载管理中的状态
-  window.windowApi.downloadPause('shutdown')
+  windowApi.downloadPause('shutdown')
   let list = {
     songList: songList.value,
     shuffledList: shuffledList.value
   }
-  window.windowApi.exitApp(JSON.stringify(list))
+  windowApi.exitApp(JSON.stringify(list))
 })
+
 window.playerApi.onSetPosition((positionSeconds) => {
   changeProgress(positionSeconds)
 })
@@ -1500,6 +1434,6 @@ window.playerApi.onShuffle(() => {
 })
 
 window.playerApi.onVolumeChanged((v) => {
-    setVolume(v)
+  setVolumeForPlay(v)
   }
 )

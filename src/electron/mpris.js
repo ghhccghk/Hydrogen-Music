@@ -1,5 +1,5 @@
 import dbus from 'dbus-next';
-import {ipcMain, app} from 'electron';
+import {app, ipcMain} from 'electron';
 import Player from "mpris-service";
 
 export function createMpris(window) {
@@ -33,8 +33,7 @@ export function createMpris(window) {
   });
 
   ipcMain.on('metadata', (e, metadata) => {
-    console.log('接收到 metadata 事件');   // 调试用
-
+    // console.log('接收到 metadata 事件');   // 调试用
     // 更新 Mpris 状态前将位置设为0, 否则 OSDLyrics 获取到的进度是上首音乐切换时的进度
     const x = {
       'mpris:trackid': player.objectPath('track/' + metadata.trackId),
@@ -45,7 +44,6 @@ export function createMpris(window) {
       'xesam:artist': metadata.artist.split(','),
       'xesam:url': metadata.url,
     };
-    console.log("metadata:", x)
     player.getPosition = () => 0;
     player.metadata = x
   });
@@ -97,14 +95,14 @@ export async function createDbus(window) {
 
 // 主进程
   ipcMain.on('sendLyrics', async (e, {track, lyrics}) => {
-    console.log('接收到 sendLyrics 事件');   // 调试用
+    // console.log('接收到 sendLyrics 事件');   // 调试用
     if (!track || !lyrics) {
-      console.warn('track 或 lyrics 为空！', {track, lyrics});
+      // console.warn('track 或 lyrics 为空！', {track, lyrics});
       return;
     }
 
-    console.log('Track 信息:', track);
-    console.log('歌词内容:', lyrics);
+    // console.log('Track 信息:', track);
+    // console.log('歌词内容:', lyrics);
 
     try {
       const metadata = {
@@ -114,7 +112,7 @@ export async function createDbus(window) {
       // 避免直接 Buffer.from(lyrics)，改用 TextEncoder
       const lyricBytes = new TextEncoder().encode(lyrics);
       await osdInterface.SetLyricContent(metadata, lyricBytes);
-      console.log('歌词已发送到 OSD');
+      // console.log('歌词已发送到 OSD');
       window.webContents.send('saveLyricFinished');
     } catch (err) {
       console.error('发送歌词到 OSD 失败:', err);

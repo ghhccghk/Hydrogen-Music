@@ -1,9 +1,9 @@
-import { defineStore } from "pinia";
-import { getPlaylistDetail, getPlaylistAll, getRecommendSongs, playlistDynamic } from '../api/playlist'
-import { getAlbumDetail, albumDynamic } from '../api/album'
-import { getArtistDetail, getArtistFansCount, getArtistTopSong, getArtistAlbum } from '../api/artist'
-import { getArtistMV } from '../api/mv'
-import { mapSongsPlayableStatus } from "../utils/songStatus";
+import {defineStore} from "pinia";
+import {getPlaylistAll, getPlaylistDetail, getRecommendSongs, playlistDynamic} from '@/api/playlist'
+import {albumDynamic, getAlbumDetail} from '@/api/album'
+import {getArtistAlbum, getArtistDetail, getArtistFansCount, getArtistTopSong} from '@/api/artist'
+import {getArtistMV} from '@/api/mv'
+import {mapSongsPlayableStatus} from "@/utils/songStatus";
 
 export const useLibraryStore = defineStore('libraryStore', {
     state: () => {

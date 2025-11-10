@@ -1,8 +1,8 @@
 import pinia from '../store/pinia'
-import { watch } from 'vue'
-import { storeToRefs } from 'pinia'
+import {watch} from 'vue'
+import {storeToRefs} from 'pinia'
 import {usePlayerStore} from '@/store/playerStore'
-import { startMusic, pauseMusic, playNext, playLast, changeProgress } from './player'
+import {changeProgress, pauseMusic, playLast, playNext, startMusic} from './player'
 
 function getCurrentTrack(storeRefs) {
   const { songList, currentIndex } = storeRefs
@@ -97,7 +97,7 @@ export function initMediaSession() {
     const cur = getCurrentTrack(refs)
     if (!cur) return
     const title = cur.name || cur.localName || 'Hydrogen Music'
-    let artists = track.ar.map(a => a.name);
+    let artists = cur.ar.map(a => a.name);
     const album = (cur.al && cur.al.name) || cur.album || ''
     let artwork = getArtworkForTrack(cur, localBase64Img.value)
     if (isMac && artwork && artwork.length > 1) artwork = [artwork[0]]
@@ -106,21 +106,11 @@ export function initMediaSession() {
         title: title,
         artist: artists.join(','),
         album: album,
-        artwork: [
-          {
-            src: cur.al.picUrl + '?param=224y224',
-            type: 'image/jpg',
-            sizes: '224x224',
-          },
-          {
-            src: cur.al.picUrl + '?param=512y512',
-            type: 'image/jpg',
-            sizes: '512x512',
-          },
-        ],
+        artwork: artwork || [],
         length: Number(time.value) || 10,
-        trackId: 0,
-        url: '/trackid/' + 0,
+        // 供 mpris 使用的附加字段
+        trackId: (cur && (cur.id || cur.url || 'local')),
+        url: (typeof cur.url === 'string') ? cur.url : ''
       };
       if (true) {
         playerApi.sendMetaData(metadata);

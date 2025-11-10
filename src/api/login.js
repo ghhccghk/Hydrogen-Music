@@ -69,7 +69,7 @@ export function loginByPhone(params) {
  * 使用Cookie登录
  * 通过粘贴网页版网易云音乐的cookie来登录
  * @param {String} cookie - 从网页版复制的cookie字符串
- * @returns
+ * @returns 
  */
 export function loginByCookie(cookie) {
   return new Promise((resolve, reject) => {

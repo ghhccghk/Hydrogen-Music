@@ -1,208 +1,219 @@
 <script setup>
-  import { ref, computed, onActivated } from 'vue'
-  import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
-  import {isLogin} from '../../utils/authority'
-  import {noticeOpen} from '../../utils/dialog';
-  import {subPlaylist} from '../../api/playlist';
-  import {subAlbum} from '../../api/album'
-  import {subArtist} from '../../api/artist';
-  import dayjs from 'dayjs'
-  import {playAll} from '../../utils/player';
-  import LibrarySongList from './LibrarySongList.vue';
-  import LibraryAlbumList from './LibraryAlbumList.vue';
-  import LibraryMVList from './LibraryMVList.vue'
-  import {usePlayerStore} from '../../store/playerStore';
-  import {useLibraryStore} from '../../store/libraryStore'
-  import {useLocalStore} from '../../store/localStore'
-  import { storeToRefs } from 'pinia'
+import {computed, ref} from 'vue'
+import {onBeforeRouteLeave, onBeforeRouteUpdate, useRouter} from 'vue-router';
+import {isLogin} from '@/utils/authority'
+import {noticeOpen} from '@/utils/dialog';
+import {subPlaylist} from '@/api/playlist';
+import {subAlbum} from '@/api/album'
+import {subArtist} from '@/api/artist';
+import {formatTime} from '@/utils/time'
+import {playAll} from '@/utils/player';
+import LibrarySongList from './LibrarySongList.vue';
+import LibraryAlbumList from './LibraryAlbumList.vue';
+import LibraryMVList from './LibraryMVList.vue'
+import {usePlayerStore} from '@/store/playerStore';
+import {useLibraryStore} from '@/store/libraryStore'
+import {useLocalStore} from '@/store/localStore'
+import {storeToRefs} from 'pinia'
 
-  const playerStore = usePlayerStore()
-  const localStore = useLocalStore()
-  const libraryStore = useLibraryStore()
-  const { updateLibraryDetail, updateArtistTopSong, updateArtistAlbum, updateArtistsMV } = libraryStore
-  const { libraryList, libraryInfo, librarySongs ,libraryAlbum ,libraryMV, playlistUserCreated, artistPageType, listType1, listType2, needTimestamp } = storeToRefs(libraryStore)
+const playerStore = usePlayerStore()
+const localStore = useLocalStore()
+const libraryStore = useLibraryStore()
+const {updateLibraryDetail, updateArtistTopSong, updateArtistAlbum, updateArtistsMV} = libraryStore
+const {
+  libraryList,
+  libraryInfo,
+  librarySongs,
+  libraryAlbum,
+  libraryMV,
+  playlistUserCreated,
+  artistPageType,
+  listType1,
+  listType2,
+  needTimestamp
+} = storeToRefs(libraryStore)
 
-  const router = useRouter()
-  const isAlbum = ref(false)
-  const isSinger = ref(false)
-  const isSongList = ref(false)
-  const introduceDetailShow = ref(false)
-  const introduceDetailShowDelay = ref(false)
+const router = useRouter()
+const isAlbum = ref(false)
+const isSinger = ref(false)
+const isSongList = ref(false)
+const introduceDetailShow = ref(false)
+const introduceDetailShowDelay = ref(false)
 
-  libraryTypeCheck(router.currentRoute.value.name)
+libraryTypeCheck(router.currentRoute.value.name)
 
-  onBeforeRouteLeave((to, from, next) => {
-    if(to.name == 'mymusic') {
-      if(!isLogin()) router.push('/login')
-      libraryInfo.value = null
-    }
-    libraryTypeCheck(to.name)
-    next()
-    document.getElementById('libraryScroll').scrollTop = 0
-  })
-
-  onBeforeRouteUpdate( async (to, from, next) => {
-    await updateLibraryDetail(to.params.id, to.name)
-    libraryTypeCheck(to.name)
-    artistPageType.value = 0
-    libraryAlbum.value = null
-    libraryMV.value = null
-    next()
-    document.getElementById('libraryScroll').scrollTop = 0
-  })
-
-  const routerChange = (operation) => {
-      if(operation) router.forward()
-      else router.back()
+onBeforeRouteLeave((to, from, next) => {
+  if (to.name == 'mymusic') {
+    if (!isLogin()) router.push('/login')
+    libraryInfo.value = null
   }
+  libraryTypeCheck(to.name)
+  next()
+  document.getElementById('libraryScroll').scrollTop = 0
+})
 
-  function libraryTypeCheck(pageName) {
-    isAlbum.value = false
-    isSinger.value = false
+onBeforeRouteUpdate(async (to, from, next) => {
+  await updateLibraryDetail(to.params.id, to.name)
+  libraryTypeCheck(to.name)
+  artistPageType.value = 0
+  libraryAlbum.value = null
+  libraryMV.value = null
+  next()
+  document.getElementById('libraryScroll').scrollTop = 0
+})
+
+const routerChange = (operation) => {
+  if (operation) router.forward()
+  else router.back()
+}
+
+function libraryTypeCheck(pageName) {
+  isAlbum.value = false
+  isSinger.value = false
+  isSongList.value = false
+  if (pageName == 'playlist' || pageName == '~playlist') {
+    isSongList.value = true
+  } else if (pageName == 'album' || pageName == '~album') {
+    isSongList.value = true
+    isAlbum.value = true
+  } else if (pageName == 'artist' || pageName == '~artist') {
+    isSinger.value = true
+    if (artistPageType.value == 0) isSongList.value = true
+  }
+}
+
+//计算歌单总时长(分)
+const totalTime = computed(() => {
+  let total = 0
+  const songList = librarySongs.value
+  songList.forEach(song => {
+    total += song.dt
+  });
+  return Math.round((total / 1000) / 60)
+})
+
+//歌单日期
+const createTime = computed(() => {
+  return formatTime(libraryInfo.value.createTime || libraryInfo.value.publishTime, "YYYY-MM-DD")
+})
+
+//如果是歌手页面，可以更换下面的类型
+const changeType = (type) => {
+  if (type == 0) {
+    isSongList.value = true
+    updateArtistTopSong(libraryInfo.value.id)
+  }
+  if (type == 1) {
     isSongList.value = false
-    if(pageName == 'playlist' || pageName == '~playlist') {
-      isSongList.value = true
-    } else if (pageName == 'album' || pageName == '~album') {
-      isSongList.value = true
-      isAlbum.value = true
-    } else if (pageName == 'artist' || pageName == '~artist') {
-      isSinger.value = true
-      if(artistPageType.value == 0) isSongList.value = true
-    }
+    updateArtistAlbum(libraryInfo.value.id)
+  }
+  if (type == 2) {
+    isSongList.value = false
+    updateArtistsMV(libraryInfo.value.id)
+  }
+  artistPageType.value = type
+}
+
+//歌单、专辑、歌手的收藏(极其降智的写法,主要问题是接口缓存的问题,使用时间戳请求数据后他不会自己更新最新缓存，所以设置了2分钟的无缓存时间)
+const subHandle = (id) => {
+  let type1 = null
+  let type2 = null
+  if (!isAlbum.value && !isSinger.value) {
+    type1 = 0, type2 = 1
+  }
+  if (isAlbum.value) {
+    needTimestamp.value.push('/album/sublist')
+    type1 = 1, type2 = 0
+    let noCacheTimer = null
+    if (noCacheTimer) clearTimeout(noCacheTimer)
+    noCacheTimer = setTimeout(() => {
+      needTimestamp.value.splice(needTimestamp.value.indexOf('/album/sublist'), 1)
+      clearTimeout(noCacheTimer)
+    }, 130000);
+  }
+  if (isSinger.value) {
+    type1 = 1, type2 = 1
+    needTimestamp.value.push('/artist/sublist')
+    let noCacheTimer = null
+    if (noCacheTimer) clearTimeout(noCacheTimer)
+    noCacheTimer = setTimeout(() => {
+      needTimestamp.value.splice(needTimestamp.value.indexOf('/artist/sublist'), 1)
+      clearTimeout(noCacheTimer)
+    }, 130000);
   }
 
-  //计算歌单总时长(分)
-  const totalTime = computed(() => {
-    let total = 0
-    const songList = librarySongs.value
-    songList.forEach(song => {
-      total += song.dt
-    });
-    return Math.round((total/1000)/60)
-  })
-
-  //歌单日期
-  const createTime = computed(() => {
-    return dayjs(libraryInfo.value.createTime || libraryInfo.value.publishTime).format("YYYY-MM-DD")
-  })
-
-  //如果是歌手页面，可以更换下面的类型
-  const changeType = (type) => {
-    if(type == 0) {
-      isSongList.value = true
-      updateArtistTopSong(libraryInfo.value.id)
-    }
-    if(type == 1) {
-      isSongList.value = false
-      updateArtistAlbum(libraryInfo.value.id)
-    }
-    if(type == 2) {
-      isSongList.value = false
-      updateArtistsMV(libraryInfo.value.id)
-    }
-    artistPageType.value = type
+  if (libraryInfo.value.followed) {
+    libraryInfo.value.followed = false
+    if (listType1.value == type1 && listType2.value == type2) libraryList.value.splice((libraryList.value || []).findIndex((item) => item.id === id), 1)
+    return
   }
-
-  //歌单、专辑、歌手的收藏(极其降智的写法,主要问题是接口缓存的问题,使用时间戳请求数据后他不会自己更新最新缓存，所以设置了2分钟的无缓存时间)
-  const subHandle = (id) => {
-    let type1 = null
-    let type2 = null
-    if(!isAlbum.value && !isSinger.value) {
-      type1 = 0,type2 = 1
-    }
-    if(isAlbum.value) {
-      needTimestamp.value.push('/album/sublist')
-      type1 = 1,type2 = 0
-      let noCacheTimer = null
-      if(noCacheTimer) clearTimeout(noCacheTimer)
-      noCacheTimer = setTimeout(() => {
-        needTimestamp.value.splice(needTimestamp.value.indexOf('/album/sublist'), 1)
-        clearTimeout(noCacheTimer)
-      }, 130000);
-    }
-    if(isSinger.value) {
-      type1 = 1,type2 = 1
-      needTimestamp.value.push('/artist/sublist')
-      let noCacheTimer = null
-      if(noCacheTimer) clearTimeout(noCacheTimer)
-      noCacheTimer = setTimeout(() => {
-        needTimestamp.value.splice(needTimestamp.value.indexOf('/artist/sublist'), 1)
-        clearTimeout(noCacheTimer)
-      }, 130000);
-    }
-    
-    if(libraryInfo.value.followed) {
-      libraryInfo.value.followed = false
-      if(listType1.value == type1 && listType2.value == type2) libraryList.value.splice((libraryList.value || []).findIndex((item) => item.id === id), 1)
-      return
-    }
-    if(!libraryInfo.value.followed) {
-      libraryInfo.value.followed = true
-      if(listType1.value == type1 && listType2.value == type2) libraryList.value.unshift(libraryInfo.value)
-      return
-    }
+  if (!libraryInfo.value.followed) {
+    libraryInfo.value.followed = true
+    if (listType1.value == type1 && listType2.value == type2) libraryList.value.unshift(libraryInfo.value)
+    return
   }
+}
 
-  const librarySub = (id) => {
+const librarySub = (id) => {
+  let params = {
+    id: id,
+    t: (libraryInfo.value.followed ? 0 : 1),
+    timestamp: new Date().getTime(),
+  }
+  if (isSinger.value) {
+    subArtist(params).then(result => {
+      if (result.code == 200) {
+        subHandle(id)
+        if (params.t == 1) noticeOpen("收藏成功", 2)
+        else noticeOpen("已取消收藏", 2)
+      } else {
+        noticeOpen("收藏/取消收藏失败", 2)
+      }
+    })
+  }
+  if (isAlbum.value) {
+    subAlbum(params).then(result => {
+      if (result.code == 200) {
+        subHandle(id)
+        if (params.t == 1) noticeOpen("收藏成功", 2)
+        else noticeOpen("已取消收藏", 2)
+      } else {
+        noticeOpen("收藏/取消收藏失败", 2)
+      }
+    })
+  }
+  if (!isAlbum.value && !isSinger.value) {
     let params = {
       id: id,
-      t: (libraryInfo.value.followed ? 0 : 1),
+      t: (libraryInfo.value.followed ? 2 : 1),
       timestamp: new Date().getTime(),
     }
-    if(isSinger.value) {
-      subArtist(params).then(result => {
-        if(result.code == 200) {
-          subHandle(id)
-          if(params.t == 1) noticeOpen("收藏成功", 2)
-          else noticeOpen("已取消收藏", 2)
-        } else {
-          noticeOpen("收藏/取消收藏失败", 2)
-        }
-      })
-    }
-    if(isAlbum.value) {
-      subAlbum(params).then(result => {
-        if(result.code == 200) {
-          subHandle(id)
-          if(params.t == 1) noticeOpen("收藏成功", 2)
-          else noticeOpen("已取消收藏", 2)
-        } else {
-          noticeOpen("收藏/取消收藏失败", 2)
-        }
-      })
-    }
-    if(!isAlbum.value && !isSinger.value) {
-      let params = {
-        id: id,
-        t: (libraryInfo.value.followed ? 2 : 1),
-        timestamp: new Date().getTime(),
+    subPlaylist(params).then(result => {
+      console.log(id)
+      console.log(result)
+      if (result.code == 200) {
+        subHandle(id)
+        if (params.t == 1) noticeOpen("收藏成功", 2)
+        else noticeOpen("已取消收藏", 2)
+      } else {
+        noticeOpen("收藏/取消收藏失败", 2)
       }
-      subPlaylist(params).then(result => {
-        console.log(id)
-        console.log(result)
-        if(result.code == 200) {
-          subHandle(id)
-          if(params.t == 1) noticeOpen("收藏成功", 2)
-          else noticeOpen("已取消收藏", 2)
-        } else {
-          noticeOpen("收藏/取消收藏失败", 2)
-        }
-      })
-    }
+    })
   }
+}
 
-  //查看并跳转歌手页面
-  const checkArtist = (artistId) => {
-    router.push('/mymusic/artist/' + artistId)
-    playerStore.forbidLastRouter = true
-  }
-  //下载本歌单/专辑全部歌曲
-  const downloadAll = () => {
-    localStore.updateDownloadList(librarySongs.value)
-  }
+//查看并跳转歌手页面
+const checkArtist = (artistId) => {
+  router.push('/mymusic/artist/' + artistId)
+  playerStore.forbidLastRouter = true
+}
+//下载本歌单/专辑全部歌曲
+const downloadAll = () => {
+  localStore.updateDownloadList(librarySongs.value)
+}
 
-  const onAfterEnter = () => introduceDetailShowDelay.value = true
-  const onAfterLeave = () => introduceDetailShowDelay.value = false
+const onAfterEnter = () => introduceDetailShowDelay.value = true
+const onAfterLeave = () => introduceDetailShowDelay.value = false
 </script>
 
 <template>
@@ -285,318 +296,414 @@
 </template>
 
 <style scoped lang="scss">
-  .library-detail{
-    width: 100%;
-    height: calc(100% - 22Px);
-    .view-control{
-      margin-left: -8Px;
+.library-detail {
+  width: 100%;
+  height: calc(100% - 22Px);
+
+  .view-control {
+    margin-left: -8Px;
+    height: 32Px;
+
+    svg {
+      padding: 8Px;
+      width: 32Px;
       height: 32Px;
-      svg{
-        padding: 8Px;
-        width: 32Px;
-        height: 32Px;
-        float: left;
-        transition: 0.2s;
-        &:hover{
-          cursor: pointer;
-          opacity: 0.7;
-        }
-        &:active{
-          transform: scale(0.9);
-        }
+      float: left;
+      transition: 0.2s;
+
+      &:hover {
+        cursor: pointer;
+        opacity: 0.7;
       }
-      .router-last{
-        margin-right: 20Px;
+
+      &:active {
+        transform: scale(0.9);
       }
     }
-    .library-introduce{
-      width: 100%;
+
+    .router-last {
+      margin-right: 20Px;
+    }
+  }
+
+  .library-introduce {
+    width: 100%;
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+
+    .introduce {
+      width: calc(100% - 130Px);
       display: flex;
-      position: relative;
-      justify-content: space-between;
-      .introduce{
-        width: calc(100% - 130Px);
-        display: flex;
-        flex-direction: row;
-        .introduce-img{
-          margin-right: 10Px;
-          border: 0.5Px solid rgb(218, 218, 218);
-          box-shadow: 0 0 6Px 1Px rgba(0, 0, 0, 0.03);
-          // padding: 2Px;
-          width: 150Px;
-          height: 150Px;
-          img{
-            width: 100%;
-            height: 100%;
-          }
+      flex-direction: row;
+
+      .introduce-img {
+        margin-right: 10Px;
+        border: 0.5Px solid rgb(218, 218, 218);
+        box-shadow: 0 0 6Px 1Px rgba(0, 0, 0, 0.03);
+        // padding: 2Px;
+        width: 150Px;
+        height: 150Px;
+
+        img {
+          width: 100%;
+          height: 100%;
         }
-        .introduce-img-circle{
+      }
+
+      .introduce-img-circle {
+        border-radius: 50%;
+
+        img {
+          width: 100%;
+          height: 100%;
           border-radius: 50%;
-          img{
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-          }
         }
-        .introduce-info{
-          width: calc(100% - 160Px);
+      }
+
+      .introduce-info {
+        width: calc(100% - 160Px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+        text-align: left;
+        user-select: text;
+
+        .introduce-name {
+          width: 90%;
+          font: 22Px Source Han Sans;
+          font-weight: bold;
+          color: black;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          word-break: break-all;
+        }
+
+        .info-other {
           display: flex;
           flex-direction: column;
-          justify-content: space-around;
-          align-items: flex-start;
-          text-align: left;
-          user-select: text;
-          .introduce-name{
-            width: 90%;
-            font:  22Px Source Han Sans;
-            font-weight: bold;
+
+          span {
+            font: 11Px SourceHanSansCN-Bold;
+          }
+
+          .introduce-author {
+            width: 100%;
+            font-size: 12Px;
             color: black;
+            transition: 0.2s;
             overflow: hidden;
             display: -webkit-box;
             -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 1;
             word-break: break-all;
+
+            &:hover {
+              cursor: pointer;
+              opacity: 0.7;
+            }
           }
-          .info-other{
+
+          .introduce-num {
+            color: rgb(122, 122, 122);
+          }
+
+          .library-operation {
+            margin-top: 10Px;
             display: flex;
-            flex-direction: column;
-            span{
-              font: 11Px SourceHanSansCN-Bold;
-            }
-            .introduce-author{
-              width: 100%;
-              font-size: 12Px;
-              color: black;
-              transition: 0.2s;
-              overflow: hidden;
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              -webkit-line-clamp: 1;
-              word-break: break-all;
-              &:hover{
-                cursor: pointer;
-                opacity: 0.7;
-              }
-            }
-            .introduce-num{
-              color: rgb(122, 122, 122);
-            }
-            .library-operation{
-              margin-top: 10Px;
+            flex-direction: row;
+
+            div {
+              margin-right: 20Px;
               display: flex;
               flex-direction: row;
-              div{
-                margin-right: 20Px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                transition: 0.2s;
-                &:hover{
-                  cursor: pointer;
-                  opacity: 0.6;
-                }
-                svg{
-                  width: 16Px;
-                  height: 16Px;
-                }
-                span{
-                  margin-left: 5Px;
-                  font-size: 15Px;
-                  color: black;
-                }
+              align-items: center;
+              transition: 0.2s;
+
+              &:hover {
+                cursor: pointer;
+                opacity: 0.6;
+              }
+
+              svg {
+                width: 16Px;
+                height: 16Px;
+              }
+
+              span {
+                margin-left: 5Px;
+                font-size: 15Px;
+                color: black;
               }
             }
           }
-        }
-      }
-      .introduce-other{
-        width: 130Px;
-        div{
-          width: 100%;
-          height: 16Px;
-        }
-        .introduce-1{
-          border: 1Px solid black;
-          font: 10Px SourceHanSansCN-Bold;
-          color: black;
-        }
-        .introduce-2{
-          margin-top: 6Px;
-          background-color: black;
-          font: 10Px SourceHanSansCN-Bold;
-          color: rgb(207, 226, 231);
-          transition: 0.2s;
-          &:hover{
-            cursor: pointer;
-            background-color: rgb(61, 61, 61);
-          }
-        }
-      }
-      .introduce-detail-text{
-        width: 0;
-        height: 0;
-        background-color: rgba(0, 0, 0, 0.9);
-        position: fixed;
-        z-index: 998;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        &-active {
-          width: 700Px;height: 400Px;padding: 30PX 60Px;
-        }
-        .detail-text{
-          width: 100%;
-          height: 100%;
-          overflow: auto;
-          &::-webkit-scrollbar{
-            display: none;
-          }
-          .text{
-            margin: 0;
-            font: 14Px Source Han Sans;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: left;
-            text-indent: 2em;
-          }
-        }
-        .text-close{
-          width: 25Px;
-          height: 25Px;
-          position: absolute;
-          top: 15Px;
-          right: 15Px;
-          opacity: 0;
-          animation: text-close 0.1s 0.6s forwards;
-          @keyframes text-close {
-            0%{opacity: 0;}
-            100%{opacity: 1;}
-          }
-          &:hover{
-            cursor: pointer;
-            opacity: 0.8 !important;
-          }
-          svg{
-            width: 100%;
-            height: 100%;
-          }
-        }
-        .dialog-style{
-          width: 9Px;
-          height: 9Px;
-          background-color: rgb(247, 247, 247);
-          position: absolute;
-          opacity: 0;
-          animation: dialog-style-in 0.4s forwards;
-          @keyframes dialog-style-in {
-            0%{opacity: 0;}
-            10%{opacity: 1;}
-            20%{opacity: 0;}
-            30%{opacity: 1;}
-            40%{opacity: 0;}
-            50%{opacity: 1;}
-            60%{opacity: 0;}
-            70%{opacity: 1;}
-            80%{opacity: 0;}
-            90%{opacity: 0;}
-            100%{opacity: 1;}
-          }
-        }
-        $position: -4Px;
-        .dialog-style1{
-          top: $position;
-          left: $position;
-        }
-        .dialog-style2{
-          top: $position;
-          right: $position;
-        }
-        .dialog-style3{
-          bottom: $position;
-          right: $position;
-        }
-        .dialog-style4{
-          bottom: $position;
-          left: $position;
         }
       }
     }
-    .library-option{
-      margin-top: 15Px;
-      padding: 0 4Px;
-      .library-type{
-        display: flex;
-        flex-direction: row;
-        span{
-          margin-right: 25Px;
-          font: 15Px SourceHanSansCN-Bold;
-          color: rgb(78, 78, 78);
-          transition: 0.2s;
-          &:hover{
-            cursor: pointer;
-            color: black;
+
+    .introduce-other {
+      width: 130Px;
+
+      div {
+        width: 100%;
+        height: 16Px;
+      }
+
+      .introduce-1 {
+        border: 1Px solid black;
+        font: 10Px SourceHanSansCN-Bold;
+        color: black;
+      }
+
+      .introduce-2 {
+        margin-top: 6Px;
+        background-color: black;
+        font: 10Px SourceHanSansCN-Bold;
+        color: white;
+        transition: 0.2s;
+
+        &:hover {
+          cursor: pointer;
+          background-color: rgb(40, 40, 40);
+        }
+      }
+    }
+
+    .introduce-detail-text {
+      width: 0;
+      height: 0;
+      /* Frosted glass panel - Light mode wants deeper (darker) */
+      background: rgba(0, 0, 0, 0.66);
+      -webkit-backdrop-filter: blur(18Px) saturate(120%);
+      backdrop-filter: blur(18Px) saturate(120%);
+      border: 1Px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10Px 30Px rgba(0, 0, 0, 0.45);
+      position: fixed;
+      z-index: 998;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      &-active {
+        width: 700Px;
+        height: 400Px;
+        padding: 30PX 60Px;
+      }
+
+      .detail-text {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .text {
+          margin: 0;
+          font: 14Px Source Han Sans;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.92);
+          text-align: left;
+          text-indent: 2em;
+        }
+      }
+
+      .text-close {
+        width: 25Px;
+        height: 25Px;
+        position: absolute;
+        top: 15Px;
+        right: 15Px;
+        opacity: 0;
+        animation: text-close 0.1s 0.6s forwards;
+        @keyframes text-close {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
           }
         }
-        .type-selected{
+
+        &:hover {
+          cursor: pointer;
+          opacity: 0.8 !important;
+        }
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        svg path {
+          fill: #ffffff !important;
+        }
+      }
+
+      .dialog-style {
+        width: 9Px;
+        height: 9Px;
+        background-color: rgba(247, 247, 247, 0.9);
+        position: absolute;
+        opacity: 0;
+        animation: dialog-style-in 0.4s forwards;
+        @keyframes dialog-style-in {
+          0% {
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          20% {
+            opacity: 0;
+          }
+          30% {
+            opacity: 1;
+          }
+          40% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0;
+          }
+          70% {
+            opacity: 1;
+          }
+          80% {
+            opacity: 0;
+          }
+          90% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+      }
+
+      $position: -4Px;
+
+      .dialog-style1 {
+        top: $position;
+        left: $position;
+      }
+
+      .dialog-style2 {
+        top: $position;
+        right: $position;
+      }
+
+      .dialog-style3 {
+        bottom: $position;
+        right: $position;
+      }
+
+      .dialog-style4 {
+        bottom: $position;
+        left: $position;
+      }
+    }
+  }
+
+  .library-option {
+    margin-top: 15Px;
+    padding: 0 4Px;
+
+    .library-type {
+      display: flex;
+      flex-direction: row;
+
+      span {
+        margin-right: 25Px;
+        font: 15Px SourceHanSansCN-Bold;
+        color: rgb(78, 78, 78);
+        transition: 0.2s;
+
+        &:hover {
+          cursor: pointer;
           color: black;
         }
       }
-      .library-playall{
-        margin: 10Px 0;
+
+      .type-selected {
+        color: black;
+      }
+    }
+
+    .library-playall {
+      margin: 10Px 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .playall {
         display: flex;
         flex-direction: row;
         align-items: center;
-        .playall{
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          transition: 0.2s;
-          &:hover{
-            cursor: pointer;
-            opacity: 0.6;
-          }
-          svg{
-            width: 17Px;
-            height: 17Px;
-          }
-          span{
-            margin: 0 5Px;
-            font: 12Px SourceHanSansCN-Bold;
-            color: black;
-            white-space: nowrap;
-          }
+        transition: 0.2s;
+
+        &:hover {
+          cursor: pointer;
+          opacity: 0.6;
         }
-        .playall-line{
-          width: 100%;
-          height: 0.5Px;
-          background-color: rgb(154, 154, 154);
+
+        svg {
+          width: 17Px;
+          height: 17Px;
         }
-        .playall-en{
-          margin-left: 4Px;
-          font: 8Px Geometos;
-          color: rgb(154, 154, 154);
-          transition: 0.2s;
-          &:hover{
-            cursor: pointer;
-            color: black;
-          }
+
+        span {
+          margin: 0 5Px;
+          font: 12Px SourceHanSansCN-Bold;
+          color: black;
+          white-space: nowrap;
         }
       }
-    }
-    .library-content{
-      height: calc(100% - 203Px);
-      overflow: auto;
-      &::-webkit-scrollbar{
-        display: none;
+
+      .playall-line {
+        width: 100%;
+        height: 0.5Px;
+        background-color: rgb(154, 154, 154);
       }
-    }
-    .library-content2{
-      height: calc(100% - 236Px);
-    }
-    .library-content3{
-      height: calc(100% - 198Px);
+
+      .playall-en {
+        margin-left: 4Px;
+        font: 8Px Geometos;
+        color: rgb(154, 154, 154);
+        transition: 0.2s;
+
+        &:hover {
+          cursor: pointer;
+          color: black;
+        }
+      }
     }
   }
+
+  .library-content {
+    height: calc(100% - 203Px);
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .library-content2 {
+    height: calc(100% - 236Px);
+  }
+
+  .library-content3 {
+    height: calc(100% - 198Px);
+  }
+}
 </style>
 
 <style lang="scss">
