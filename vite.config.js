@@ -65,13 +65,13 @@ export default defineConfig({
       }
     },
     // 启用更激进的压缩
-    // minify: 'terser',
+    minify: 'terser',
     terserOptions: {
       compress: {
-        // // 生产环境移除 console
-        // drop_console: false,
-        // drop_debugger: false,
-        // pure_funcs: ['console.log', 'console.info', 'console.warn']
+        // 生产环境移除 console
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.warn']
       },
       mangle: {
         // 避免 eval 相关问题
@@ -79,11 +79,11 @@ export default defineConfig({
       },
       format: {
         // 移除注释
-        comments: true
+        comments: false
       }
     },
     // 启用 CSS 代码分割
-    cssCodeSplit: false,
+    cssCodeSplit: true,
     // 减少打包体积阈值警告
     chunkSizeWarningLimit: 1000
   },
