@@ -4,38 +4,6 @@ import { storeToRefs } from 'pinia'
 import {usePlayerStore} from '@/store/playerStore'
 import { startMusic, pauseMusic, playNext, playLast, changeProgress } from './player'
 
-
-playerApi.onSaveLyricFinished(() => {
-  const playerStore = usePlayerStore(pinia)
-  const refs = storeToRefs(playerStore)
-  const cur = getCurrentTrack(refs)
-  if (!cur) return
-  const title = cur.name || cur.localName || 'Hydrogen Music'
-  const artist = Array.isArray(cur.ar) ? cur.ar.map(a => a && a.name).filter(Boolean).join(', ') : (cur.artist || '')
-  const album = (cur.al && cur.al.name) || cur.album || ''
-  const metadata = {
-    title: title,
-    artUrl: artist,
-    artist: artist,
-    album: album,
-    artwork: [
-      {
-        src: cur.al.picUrl + '?param=224y224',
-        type: 'image/jpg',
-        sizes: '224x224',
-      },
-      {
-        src: cur.al.picUrl + '?param=512y512',
-        type: 'image/jpg',
-        sizes: '512x512',
-      },
-    ],
-    length: Number(time.value) || 10
-  };
-
-  playerApi.sendMetaData(metadata);
-});
-
 function getCurrentTrack(storeRefs) {
   const { songList, currentIndex } = storeRefs
   const list = songList.value || []
@@ -129,15 +97,14 @@ export function initMediaSession() {
     const cur = getCurrentTrack(refs)
     if (!cur) return
     const title = cur.name || cur.localName || 'Hydrogen Music'
-    const artist = Array.isArray(cur.ar) ? cur.ar.map(a => a && a.name).filter(Boolean).join(', ') : (cur.artist || '')
+    let artists = track.ar.map(a => a.name);
     const album = (cur.al && cur.al.name) || cur.album || ''
     let artwork = getArtworkForTrack(cur, localBase64Img.value)
     if (isMac && artwork && artwork.length > 1) artwork = [artwork[0]]
     try {
       const metadata = {
         title: title,
-        artUrl: artist,
-        artist: artist,
+        artist: artists.join(','),
         album: album,
         artwork: [
           {
@@ -151,7 +118,9 @@ export function initMediaSession() {
             sizes: '512x512',
           },
         ],
-        length: Number(time.value) || 10
+        length: Number(time.value) || 10,
+        trackId: 0,
+        url: '/trackid/' + 0,
       };
       if (true) {
         playerApi.sendMetaData(metadata);

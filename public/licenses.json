@@ -31,6 +31,14 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@babel/types",
     "licenseFile": "node_modules/@babel/types/LICENSE"
   },
+  "@borewit/text-codec@0.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Borewit/text-codec",
+    "publisher": "Borewit",
+    "url": "https://github.com/Borewit",
+    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@borewit/text-codec",
+    "licenseFile": "node_modules/@borewit/text-codec/LICENSE.txt"
+  },
   "@derhuerst/http-basic@8.2.4": {
     "licenses": "MIT",
     "repository": "https://github.com/derhuerst/http-basic",
@@ -46,7 +54,7 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@jridgewell/sourcemap-codec",
     "licenseFile": "node_modules/@jridgewell/sourcemap-codec/LICENSE"
   },
-  "@neteasecloudmusicapienhanced/api@4.29.11": {
+  "@neteasecloudmusicapienhanced/api@4.29.16": {
     "licenses": "MIT",
     "publisher": "MoeFurina",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@neteasecloudmusicapienhanced/api",
@@ -57,6 +65,14 @@
     "repository": "https://github.com/nornagon/node-put",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@nornagon/put",
     "licenseFile": "node_modules/@nornagon/put/LICENSE"
+  },
+  "@tokenizer/inflate@0.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Borewit/tokenizer-inflate",
+    "publisher": "Borewit",
+    "url": "https://github.com/Borewit",
+    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/@tokenizer/inflate",
+    "licenseFile": "node_modules/@tokenizer/inflate/LICENSE"
   },
   "@tokenizer/token@0.3.0": {
     "licenses": "MIT",
@@ -246,7 +262,7 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/atomically",
     "licenseFile": "node_modules/atomically/LICENSE"
   },
-  "axios@1.12.2": {
+  "axios@1.13.2": {
     "licenses": "MIT",
     "repository": "https://github.com/axios/axios",
     "publisher": "Matt Zabriskie",
@@ -508,7 +524,7 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/dateformat",
     "licenseFile": "node_modules/dateformat/LICENSE"
   },
-  "dayjs@1.11.18": {
+  "dayjs@1.11.19": {
     "licenses": "MIT",
     "repository": "https://github.com/iamkun/dayjs",
     "publisher": "iamkun",
@@ -853,13 +869,21 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/fast-safe-stringify",
     "licenseFile": "node_modules/fast-safe-stringify/LICENSE"
   },
+  "fflate@0.8.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/101arrowz/fflate",
+    "publisher": "Arjun Barrett",
+    "email": "arjunbarrett@gmail.com",
+    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/fflate",
+    "licenseFile": "node_modules/fflate/LICENSE"
+  },
   "ffmpeg-static@5.2.0": {
     "licenses": "GPL-3.0-or-later",
     "repository": "https://github.com/eugeneware/ffmpeg-static",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/ffmpeg-static",
     "licenseFile": "node_modules/ffmpeg-static/LICENSE"
   },
-  "file-type@16.5.4": {
+  "file-type@21.1.0": {
     "licenses": "MIT",
     "repository": "https://github.com/sindresorhus/file-type",
     "publisher": "Sindre Sorhus",
@@ -1407,9 +1431,9 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/ms",
     "licenseFile": "node_modules/ms/license.md"
   },
-  "music-metadata@7.14.0": {
+  "music-metadata@11.10.0": {
     "licenses": "MIT",
-    "repository": "https://github.com/borewit/music-metadata",
+    "repository": "https://github.com/Borewit/music-metadata",
     "publisher": "Borewit",
     "url": "https://github.com/Borewit",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/music-metadata",
@@ -1591,14 +1615,6 @@
     "url": "dominictarr.com",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/pause-stream",
     "licenseFile": "node_modules/pause-stream/LICENSE"
-  },
-  "peek-readable@4.1.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/Borewit/peek-readable",
-    "publisher": "Borewit",
-    "url": "https://github.com/Borewit",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/peek-readable",
-    "licenseFile": "node_modules/peek-readable/LICENSE"
   },
   "picocolors@1.1.1": {
     "licenses": "ISC",
@@ -1785,14 +1801,6 @@
     "repository": "https://github.com/nodejs/readable-stream",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/readable-stream",
     "licenseFile": "node_modules/readable-stream/LICENSE"
-  },
-  "readable-web-to-node-stream@3.0.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/Borewit/readable-web-to-node-stream",
-    "publisher": "Borewit",
-    "url": "https://github.com/Borewit",
-    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/readable-web-to-node-stream",
-    "licenseFile": "node_modules/readable-web-to-node-stream/README.md"
   },
   "regexp.prototype.flags@1.5.4": {
     "licenses": "MIT",
@@ -2079,13 +2087,13 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/strip-json-comments",
     "licenseFile": "node_modules/strip-json-comments/license"
   },
-  "strtok3@6.3.0": {
+  "strtok3@10.3.4": {
     "licenses": "MIT",
     "repository": "https://github.com/Borewit/strtok3",
     "publisher": "Borewit",
     "url": "https://github.com/Borewit",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/strtok3",
-    "licenseFile": "node_modules/strtok3/LICENSE"
+    "licenseFile": "node_modules/strtok3/LICENSE.txt"
   },
   "supports-color@7.2.0": {
     "licenses": "MIT",
@@ -2121,13 +2129,13 @@
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/toidentifier",
     "licenseFile": "node_modules/toidentifier/LICENSE"
   },
-  "token-types@4.2.1": {
+  "token-types@6.1.1": {
     "licenses": "MIT",
     "repository": "https://github.com/Borewit/token-types",
     "publisher": "Borewit",
     "url": "https://github.com/Borewit",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/token-types",
-    "licenseFile": "node_modules/token-types/LICENSE"
+    "licenseFile": "node_modules/token-types/LICENSE.txt"
   },
   "tslib@2.8.1": {
     "licenses": "0BSD",
@@ -2174,6 +2182,15 @@
     "publisher": "Microsoft Corp.",
     "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/typescript",
     "licenseFile": "node_modules/typescript/LICENSE.txt"
+  },
+  "uint8array-extras@1.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/uint8array-extras",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "/home/ghhc/qt/Hydrogen-Music/node_modules/uint8array-extras",
+    "licenseFile": "node_modules/uint8array-extras/license"
   },
   "undici-types@6.21.0": {
     "licenses": "MIT",

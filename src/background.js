@@ -41,8 +41,6 @@ if (!gotTheLock) {
 
   // 尝试启用平台 HEVC 硬件解码（在支持的平台上）
   try {
-    app.commandLine.appendSwitch('no-sandbox')
-
     app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport')
     // 某些平台可能需要忽略 GPU 黑名单以启用硬件解码
     app.commandLine.appendSwitch('ignore-gpu-blocklist')

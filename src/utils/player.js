@@ -61,7 +61,6 @@ watch(volume, (v) => {
 })
 
 watch(lyric, (newVal, oldVal) => {
-  console.debug('歌词变化:', newVal.lrc)
   try {
     const cur = getCurrentTrack(refplayerstore)
     // 去掉不可克隆字段，只保留 name/ar 等纯数据
@@ -69,9 +68,6 @@ watch(lyric, (newVal, oldVal) => {
       name: cur.name,
       ar: cur.ar.map(ar => ar.name).join(', ')
     }
-    console.debug('watch 触发, 当前曲目:', cur)
-    console.debug('歌词内容:', newVal.lrc)
-    console.debug('cur内容:', cur)
 
     if (!cur) {
       console.debug('cur 为空，无法发送歌词')
@@ -88,6 +84,40 @@ watch(lyric, (newVal, oldVal) => {
     console.debug('发送歌词失败:', e)
   }
 }, {deep: true})
+
+
+playerApi.onSaveLyricFinished(() => {
+  const playerStore = usePlayerStore(pinia)
+  const refs = storeToRefs(playerStore)
+  const cur = getCurrentTrack(refs)
+  if (!cur) return
+  console.debug(cur)
+  const title = cur.name || cur.localName || 'Hydrogen Music'
+  let artists = cur.ar.map(a => a.name);
+  const album = (cur.al && cur.al.name) || cur.album || ''
+  const metadata = {
+    title: title,
+    artist: artists.join(','),
+    album: album,
+    artwork: [
+      {
+        src: cur.al.picUrl + '?param=224y224',
+        type: 'image/jpg',
+        sizes: '224x224',
+      },
+      {
+        src: cur.al.picUrl + '?param=512y512',
+        type: 'image/jpg',
+        sizes: '512x512',
+      },
+    ],
+    length: Number(time.value) || 10,
+    trackId: 0,
+    url: '/trackid/' + 0,
+  };
+
+  playerApi.sendMetaData(metadata);
+});
 
 function getCurrentTrack(storeRefs) {
   const {songList, currentIndex} = storeRefs

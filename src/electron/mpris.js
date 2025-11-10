@@ -42,7 +42,7 @@ export function createMpris(window) {
       'mpris:length': metadata.length * 1000 * 1000,
       'xesam:title': metadata.title,
       'xesam:album': metadata.album,
-      'xesam:artist': metadata.artist,
+      'xesam:artist': metadata.artist.split(','),
       'xesam:url': metadata.url,
     };
     console.log("metadata:", x)
@@ -112,7 +112,7 @@ export async function createDbus(window) {
         artist: new Variant('s', track.ar),
       };
       // 避免直接 Buffer.from(lyrics)，改用 TextEncoder
-      const lyricBytes = new TextEncoder().encode(lyrics); // Uint8Array
+      const lyricBytes = new TextEncoder().encode(lyrics);
       await osdInterface.SetLyricContent(metadata, lyricBytes);
       console.log('歌词已发送到 OSD');
       window.webContents.send('saveLyricFinished');
