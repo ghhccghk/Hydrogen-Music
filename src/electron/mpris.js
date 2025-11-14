@@ -95,14 +95,14 @@ export async function createDbus(window) {
 
 // 主进程
   ipcMain.on('sendLyrics', async (e, {track, lyrics}) => {
-    // console.log('接收到 sendLyrics 事件');   // 调试用
+    console.log('接收到 sendLyrics 事件');   // 调试用
     if (!track || !lyrics) {
-      // console.warn('track 或 lyrics 为空！', {track, lyrics});
+      console.warn('track 或 lyrics 为空！', {track, lyrics});
       return;
     }
 
-    // console.log('Track 信息:', track);
-    // console.log('歌词内容:', lyrics);
+    console.log('Track 信息:', track);
+    console.log('歌词内容:', lyrics);
 
     try {
       const metadata = {
@@ -112,7 +112,7 @@ export async function createDbus(window) {
       // 避免直接 Buffer.from(lyrics)，改用 TextEncoder
       const lyricBytes = new TextEncoder().encode(lyrics);
       await osdInterface.SetLyricContent(metadata, lyricBytes);
-      // console.log('歌词已发送到 OSD');
+      console.debug('歌词已发送到 OSD');
       window.webContents.send('saveLyricFinished');
     } catch (err) {
       console.error('发送歌词到 OSD 失败:', err);

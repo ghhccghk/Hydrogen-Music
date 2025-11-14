@@ -10,6 +10,7 @@ import {useLibraryStore} from '@/store/libraryStore'
 import {useOtherStore} from '@/store/otherStore'
 import {storeToRefs} from 'pinia'
 import {watch} from "vue";
+import {isMac} from "@/utils/platform";
 
 const otherStore = useOtherStore()
 const userStore = useUserStore()
@@ -58,6 +59,79 @@ let lastRefreshAttempt = 0
 watch(volume, (v) => {
   window.playerApi?.setVolume?.(v)
 })
+
+watch(lyric, (newVal) => {
+  try {
+    const playerStore = usePlayerStore(pinia)
+    const refs = storeToRefs(playerStore)
+    const cur = getCurrentTrack(refs)
+    if (!cur) {
+      console.debug('cur 为空，无法发送歌词')
+      return
+    }
+
+    // 去掉不可克隆字段，只保留 name/ar 等纯数据
+    const trackData = {
+      name: cur.name,
+      ar: cur.ar.map(ar => ar.name).join(', ')
+    }
+
+    if (!newVal || !newVal.lrc.lyric) {
+      console.debug('歌词内容为空:', newVal.lrc.lyric)
+      return
+    }
+
+    window.playerApi.sendLyrics(trackData, newVal.lrc.lyric)
+  } catch (e) {
+    console.debug('发送歌词失败:', e)
+  }
+}, {deep: true})
+
+playerApi.onSaveLyricFinished(() => {
+  console.log("gcwanc")
+  const playerStore = usePlayerStore(pinia)
+  const refs = storeToRefs(playerStore)
+  const cur = getCurrentTrack(refs)
+  if (!cur) return
+  const title = cur.name || cur.localName || 'Hydrogen Music'
+  const artist = Array.isArray(cur.ar) ? cur.ar.map(a => a && a.name).filter(Boolean).join(', ') : (cur.artist || '')
+  let artwork = getArtworkForTrack(cur, localBase64Img.value)
+  if (isMac && artwork && artwork.length > 1) artwork = [artwork[0]]
+  const album = (cur.al && cur.al.name) || cur.album || ''
+  const metadata = {
+    title: title,
+    artist: artist,
+    album: album,
+    artwork: artwork || [],
+    length: Number(time.value) || 10,
+    // 供 mpris 使用的附加字段
+    trackId: (cur && (cur.id || cur.url || 'local')),
+    url: (typeof cur.url === 'string') ? cur.url : ''
+  };
+  playerApi.sendMetaData(metadata);
+});
+
+
+function getArtworkForTrack(track, localBase64) {
+  const arts = []
+  if (localBase64) {
+    arts.push({src: localBase64})
+  }
+  const cover = (track && (track.coverUrl || (track.al && track.al.picUrl) || track.blurPicUrl || track.img1v1Url)) || null
+  if (cover) {
+    // Use a single stable size to avoid artwork swaps in OS UI
+    const sizes = [256]
+    sizes.forEach(sz => arts.push({src: `${cover}?param=${sz}y${sz}`}))
+  }
+  return arts
+}
+
+function getCurrentTrack(storeRefs) {
+  const {songList, currentIndex} = storeRefs
+  const list = songList.value || []
+  const idx = typeof currentIndex.value === 'number' ? currentIndex.value : 0
+  return list[idx] || null
+}
 
 // 统一更新窗口标题和（macOS）Dock菜单
 function updateWindowTitleDock() {
