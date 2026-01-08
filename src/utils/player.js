@@ -88,8 +88,8 @@ watch(lyric, (newVal) => {
 }, {deep: true})
 
 playerApi.onSaveLyricFinished(() => {
-  console.log("gcwanc")
   const playerStore = usePlayerStore(pinia)
+  const {time} = storeToRefs(playerStore)
   const refs = storeToRefs(playerStore)
   const cur = getCurrentTrack(refs)
   if (!cur) return
