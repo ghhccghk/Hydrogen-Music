@@ -112,9 +112,8 @@ export function initMediaSession() {
         trackId: (cur && (cur.id || cur.url || 'local')),
         url: (typeof cur.url === 'string') ? cur.url : ''
       };
-      if (true) {
-        playerApi.sendMetaData(metadata);
-      }
+
+      playerApi.sendMetaData(metadata) && windowApi.sendMetaData(metadata);
       navigator.mediaSession.metadata = new window.MediaMetadata(metadata);
     } catch (e) {
       console.log("mediaSession,metadata" + e)
@@ -189,6 +188,9 @@ export function initMediaSession() {
         // 仅刷新 metadata，不动 position，避免产生闪烁；macOS 下只更新一次 artwork
         updateMetadata()
       })
+    playerApi.onSaveLyricFinished(() => {
+      updateMetadata()
+    })
   } catch (_) {}
 }
 

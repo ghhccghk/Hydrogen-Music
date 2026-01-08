@@ -44,6 +44,7 @@ export function createMpris(window) {
       'xesam:artist': metadata.artist.split(','),
       'xesam:url': metadata.url,
     };
+    console.log('接收到 metadata 事件' + metadata.length);
     player.getPosition = () => 0;
     player.metadata = x
   });
@@ -100,9 +101,6 @@ export async function createDbus(window) {
       console.warn('track 或 lyrics 为空！', {track, lyrics});
       return;
     }
-
-    console.log('Track 信息:', track);
-    console.log('歌词内容:', lyrics);
 
     try {
       const metadata = {
